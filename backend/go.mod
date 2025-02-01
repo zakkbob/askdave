@@ -1,4 +1,4 @@
-module github.com/ZakkBob/AskDave/backend
+module ZakkBob/AskDave/backend
 
 go 1.23.5
 
