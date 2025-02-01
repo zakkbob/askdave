@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ZakkBob/AskDave/backend/epicmodule"
+	"ZakkBob/AskDave/backend/epicmodule"
 
 	"fmt"
 
