@@ -1,12 +1,7 @@
 package main
 
 import (
-	"ZakkBob/AskDave/backend/epicmodule"
-
-	"fmt"
-
     "net/http"
-
     "github.com/gin-gonic/gin"
 )
 
@@ -69,8 +64,6 @@ func deleteAlbum(context *gin.Context) {
 }
 
 func main() {
-	fmt.Println(epicmodule.ImportedNum)
-
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
