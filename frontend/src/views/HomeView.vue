@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import Search from '../components/Search.vue'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
+  <main class="flex flex-row justify-center items-center h-screen w-full">
+    <Search />
   </main>
 </template>
