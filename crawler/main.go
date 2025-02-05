@@ -20,13 +20,33 @@ func fetch_page(url string) (string, error) {
 	return string(body), nil
 }
 
-func extract_page_info(page string) (page_title, og_title, og_description string) {
-	title_regex, _ := regexp.Compile("(?s)property=\"og:title\".*?content=\"(.*?)\"")
-	matches := title_regex.FindStringSubmatch(page)
-	page_title = matches[0]
+func extract_meta_property_content(page string, meta_property string) (meta_content string) {
+	meta_el_regex_string := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", meta_property) //Temporary fix, won't work if content contains a '>'
+	fmt.Println(meta_el_regex_string)
+	meta_el_regex      := regexp.MustCompile(meta_el_regex_string)
+	meta_content_regex := regexp.MustCompile("(?s)content=\"(.*?)\"")
+	
+	el_matches := meta_el_regex.FindStringSubmatch(page)
+	fmt.Println(el_matches)
+	if len(el_matches) < 1{
+		return ""
+	}
 
-	og_title = ""
-	og_description = ""
+	meta_el := el_matches[0]
+
+	content_matches := meta_content_regex.FindStringSubmatch(meta_el)
+	if len(content_matches) < 2{
+		return ""
+	}
+
+	meta_content = content_matches[1]
+	return meta_content
+}
+
+func extract_page_info(page string) (page_title, og_title, og_description string) {
+	og_title = extract_meta_property_content(page, "title")
+	og_description = extract_meta_property_content(page, "description")
+	page_title = ""
 
 	return
 }
@@ -39,6 +59,8 @@ func main() {
 	// } else {
 	// 	fmt.Printf("%s", body)
 	// }
-	page_title, _, _ := extract_page_info(body)
+	page_title, og_title, og_description := extract_page_info(body)
 	fmt.Println(page_title)
+	fmt.Println(og_title)
+	fmt.Println(og_description)
 }
