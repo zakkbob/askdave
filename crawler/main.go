@@ -12,7 +12,8 @@ type page struct {
 	page_title     string
 	og_title       string
 	og_description string
-	og_site_name      string
+	og_site_name   string
+	links          []string
 }
 
 func fetch_page(url string) (string, error) {
@@ -50,11 +51,24 @@ func extract_meta_property_content(page string, meta_property string) (meta_cont
 	return meta_content
 }
 
-func extract_page_info(page string) (page_title, og_title, og_description, og_site_name string) {
+func extratct_page_title(page string) (page_title string) {
+	page_title_regex := regexp.MustCompile("(?s)<title>(.*?)</title>")
+	matches := page_title_regex.FindStringSubmatch(page)
+
+	if len(matches) < 2 {
+		return ""
+	}
+
+	page_title = matches[1]
+	return page_title
+}
+
+func extract_page_data(page string) (page_title, og_title, og_description, og_site_name string) {
 	og_title = extract_meta_property_content(page, "title")
 	og_description = extract_meta_property_content(page, "description")
 	og_site_name = extract_meta_property_content(page, "site_name")
-	page_title = ""
+
+	page_title = extratct_page_title(page)
 
 	return
 }
@@ -66,7 +80,7 @@ func fetch_page_data(url string) (page_data page) {
 	// } else {
 	// 	fmt.Printf("%s", body)
 	// }
-	page_title, og_title, og_description, og_site_name := extract_page_info(body)
+	page_title, og_title, og_description, og_site_name := extract_page_data(body)
 	page_data = page{
 		url:            url,
 		page_title:     page_title,
