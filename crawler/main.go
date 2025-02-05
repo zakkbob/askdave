@@ -22,12 +22,11 @@ func fetch_page(url string) (string, error) {
 
 func extract_meta_property_content(page string, meta_property string) (meta_content string) {
 	meta_el_regex_string := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", meta_property) //Temporary fix, won't work if content contains a '>'
-	fmt.Println(meta_el_regex_string)
+	
 	meta_el_regex      := regexp.MustCompile(meta_el_regex_string)
 	meta_content_regex := regexp.MustCompile("(?s)content=\"(.*?)\"")
 	
 	el_matches := meta_el_regex.FindStringSubmatch(page)
-	fmt.Println(el_matches)
 	if len(el_matches) < 1{
 		return ""
 	}
@@ -43,24 +42,26 @@ func extract_meta_property_content(page string, meta_property string) (meta_cont
 	return meta_content
 }
 
-func extract_page_info(page string) (page_title, og_title, og_description string) {
-	og_title = extract_meta_property_content(page, "title")
+func extract_page_info(page string) (page_title, og_title, og_description, og_site_name string) {
+	og_title       = extract_meta_property_content(page, "title")
 	og_description = extract_meta_property_content(page, "description")
+	og_site_name   = extract_meta_property_content(page, "site_name")
 	page_title = ""
 
 	return
 }
 
 func main() {
-	url := "https://greendungarees.org.uk"
+	url := "https://mateishome.page"
 	body, _ := fetch_page(url)
 	// if err != nil {
 	// 	fmt.Println(err)
 	// } else {
 	// 	fmt.Printf("%s", body)
 	// }
-	page_title, og_title, og_description := extract_page_info(body)
+	page_title, og_title, og_description, og_site_name := extract_page_info(body)
 	fmt.Println(page_title)
 	fmt.Println(og_title)
 	fmt.Println(og_description)
+	fmt.Println(og_site_name)
 }
