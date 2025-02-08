@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"testing"
 	"os"
 )
@@ -39,7 +38,4 @@ func TestUrlValidator(t *testing.T) {
 			t.Errorf("'%s' got %t, want %t", url, got, want)
 		}
 	}
-
-	//t.Log(blocks)
-	//fmt.Println(blocks)
 }
