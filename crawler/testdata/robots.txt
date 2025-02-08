@@ -8,6 +8,8 @@ Disallow: /disallowed
 Allow: /disallowed/nevermind-this-is-allowed #comment
 Disallow: /*.php # OMMMENT##CMMMENT IN COMMENT /eee
 Disallow: /endline$
+Disallow:/allow-subdir/
+Allow: /allow-subdir/*
 #Disallow: *
 
 User-agent: bingbot 
