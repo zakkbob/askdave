@@ -11,7 +11,8 @@ Probably too detailed to be a 'roadmap' but oh well
 - [x] DaveBot can discover new sites from external links
 
 **Dave's Integrity**
-- [ ] DaveBot respects bots.txt :D
+- [x] Davebot understands robots.txt
+- [ ] DaveBot respects robots.txt :D
 
 **Site Data Discovery**
 - [x] DaveBot discovers page title and description from meta tags
