@@ -17,7 +17,7 @@ func getRobotsTxt(t *testing.T) string {
 func TestUrlValidator(t *testing.T) {
     robotsTxt := getRobotsTxt(t)
 
-	validator, _ := processRobotsTxt(robotsTxt)
+	validator, _ := ProcessRobotsTxt(robotsTxt)
 
 	testUrls := map[string]bool{
 		"/allowed-dir": true,
