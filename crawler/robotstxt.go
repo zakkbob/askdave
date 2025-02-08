@@ -94,6 +94,21 @@ func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
 	return regex, err
 }
 
+func removeComments(s string) string {
+	noComments := ""
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("error occurred: %v\n", err)
+	}
+
+	for scanner.Scan() {
+		stringSplit := strings.Split(scanner.Text(), "#")
+		noComments += stringSplit[0] + "\n"
+	}
+	return noComments
+}
+
 func generateUrlValidator(directives string) urlValidator{
 	validator := urlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
 
@@ -131,6 +146,7 @@ func generateUrlValidator(directives string) urlValidator{
 }
 
 func processRobotsTxt(content string) (validator urlValidator, sitemapUrl string) {
+	content = removeComments(content)
 	blocks := extractUserAgentBlocks(content)
 	directives := extractReleventDirectives(blocks)
 	validator = generateUrlValidator(directives)
