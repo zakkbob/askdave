@@ -1,0 +1,13 @@
+User-agent: * 
+Disallow: / 
+
+User-agent: Davebot
+Allow: /allowed-dir/
+Disall: /invalid-directive
+Disallow: /disallowed
+Allow: /disallowed/nevermind-this-is-allowed
+Disallow: /*.php
+Disallow: /endline$
+
+User-agent: bingbot 
+Disallow: /not-for-bing/ 
