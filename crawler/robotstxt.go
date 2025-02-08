@@ -5,14 +5,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"regexp"
 	"strings"
-	"bufio"
 )
 
 type urlValidator struct {
-	allowedPatterns   []*regexp.Regexp
+	allowedPatterns    []*regexp.Regexp
 	disallowedPatterns []*regexp.Regexp
 }
 
@@ -51,10 +51,10 @@ func extractUserAgentBlocks(content string) (blocks map[string]string) {
 	matches := agentRegex.Split(content, -1)
 
 	blockRegex := regexp.MustCompile("(?si)(.*?)(?:\r\n|\r|\n)(.*)") //Dodgy regex v2 (yes i know i can do this without regex, but regex = high iq)
-	
+
 	for _, match := range matches {
 		captures := blockRegex.FindStringSubmatch(match)
-		
+
 		if len(captures) < 3 {
 			continue
 		}
@@ -68,14 +68,14 @@ func extractUserAgentBlocks(content string) (blocks map[string]string) {
 	return blocks
 }
 
-func extractReleventDirectives(userAgentBlocks map[string]string) (directives string) {//Yeah yeah, i know i suck at naming things
-	userAgents := map[string]int{"*":0, "davebot":1, "davebot/0.1":2} // attempts to match with most specific user agent
+func extractReleventDirectives(userAgentBlocks map[string]string) (directives string) { //Yeah yeah, i know i suck at naming things
+	userAgents := map[string]int{"*": 0, "davebot": 1, "davebot/0.1": 2} // attempts to match with most specific user agent
 
 	currentAgentSpecificity := -1
 
 	for k, v := range userAgentBlocks {
 		agentSpecificity, ok := userAgents[k]
-		if !ok || agentSpecificity < currentAgentSpecificity{
+		if !ok || agentSpecificity < currentAgentSpecificity {
 			continue
 		}
 
@@ -86,7 +86,7 @@ func extractReleventDirectives(userAgentBlocks map[string]string) (directives st
 }
 
 func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
-	pattern = "^" + pattern // match start of string
+	pattern = "^" + pattern                          // match start of string
 	pattern = strings.ReplaceAll(pattern, "*", ".+") //wildcard
 
 	regex, err = regexp.Compile(pattern)
@@ -97,7 +97,7 @@ func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
 func removeComments(s string) string {
 	noComments := ""
 	scanner := bufio.NewScanner(strings.NewReader(s))
-	
+
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
 	}
@@ -109,12 +109,12 @@ func removeComments(s string) string {
 	return noComments
 }
 
-func generateUrlValidator(directives string) urlValidator{
+func generateUrlValidator(directives string) urlValidator {
 	validator := urlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
 
 	scanner := bufio.NewScanner(strings.NewReader(directives))
 	directiveRegex := regexp.MustCompile("(?i)(.*?):(.*)")
-	
+
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
 	}
@@ -125,20 +125,20 @@ func generateUrlValidator(directives string) urlValidator{
 		if len(directive) < 3 {
 			continue
 		}
-		
+
 		name := strings.ToLower(strings.TrimSpace(directive[1]))
 		value := strings.TrimSpace(directive[2])
 
 		regex, err := convertToRegex(value)
-		if err != nil{
+		if err != nil {
 			continue
 		}
 
 		switch name {
-			case "disallow":
-				validator.disallowedPatterns = append(validator.disallowedPatterns, regex)
-			case "allow":
-				validator.allowedPatterns = append(validator.allowedPatterns, regex)
+		case "disallow":
+			validator.disallowedPatterns = append(validator.disallowedPatterns, regex)
+		case "allow":
+			validator.allowedPatterns = append(validator.allowedPatterns, regex)
 		}
 	}
 
@@ -150,6 +150,6 @@ func ProcessRobotsTxt(content string) (validator urlValidator, sitemapUrl string
 	blocks := extractUserAgentBlocks(content)
 	directives := extractReleventDirectives(blocks)
 	validator = generateUrlValidator(directives)
-	
+
 	return validator, ""
 }
