@@ -1,3 +1,7 @@
+//----------------------------------------------------------//
+// Processes urls into a struct (for consistent formatting) //
+//----------------------------------------------------------//
+
 package main
 
 import (
