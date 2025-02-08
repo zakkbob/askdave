@@ -7,7 +7,7 @@ import (
 func TestUrlString(t *testing.T) {
 	testUrls := []url{
 		url{
-			"https", "www", "example", "com",
+			"https", "www", "example", "com", 8080,
 			[]string{
 				"privacy",
 			}, true,
@@ -16,10 +16,17 @@ func TestUrlString(t *testing.T) {
 			domain: "example",
 			tld:    "com",
 		},
+		url{
+			protocol: "http",
+			domain:   "example",
+			tld:      "com",
+			port:     80,
+		},
 	}
 	expectedUrls := []string{
-		"https://www.example.com/privacy/",
+		"https://www.example.com:8080/privacy/",
 		"example.com",
+		"http://example.com",
 	}
 
 	for i, u := range testUrls {
