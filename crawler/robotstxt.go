@@ -25,7 +25,6 @@ func (validator *urlValidator) validate(url string) bool {
 			continue
 		}
 		matchLength := indices[1] - indices[0]
-		fmt.Println(matchLength)
 		if matchLength > longestMatch {
 			longestMatch = matchLength
 			isValid = true
@@ -37,7 +36,6 @@ func (validator *urlValidator) validate(url string) bool {
 			continue
 		}
 		matchLength := indices[1] - indices[0]
-		fmt.Println(matchLength)
 		if matchLength > longestMatch {
 			longestMatch = matchLength
 			isValid = false

@@ -1,7 +1,7 @@
 User-agent: * 
 Disallow: / 
 
-User-agent: Davebot
+User-agent: Davebot/0.1
 Allow: /allowed-dir/
 Disall: /invalid-directive
 Disallow: /disallowed
