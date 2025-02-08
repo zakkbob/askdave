@@ -1,13 +1,14 @@
 User-agent: * 
 Disallow: / 
 
-User-agent: Davebot/0.1
+User-agent: Davebot/0.1 #im a comment which means im not here
 Allow: /allowed-dir/
 Disall: /invalid-directive
 Disallow: /disallowed
-Allow: /disallowed/nevermind-this-is-allowed
-Disallow: /*.php
+Allow: /disallowed/nevermind-this-is-allowed #comment
+Disallow: /*.php # OMMMENT##CMMMENT IN COMMENT /eee
 Disallow: /endline$
+#Disallow: *
 
 User-agent: bingbot 
 Disallow: /not-for-bing/ 
