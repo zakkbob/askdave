@@ -29,6 +29,8 @@ func TestUrlValidator(t *testing.T) {
 		"/endline": false,
 		"/endline/not-lol": true,
 		"/allowed-dir/disallowed-php.php": false,
+		"/allow-subdir/": false,
+		"/allow-subdir/e": true,
 	}
 
 	for url, want := range testUrls {

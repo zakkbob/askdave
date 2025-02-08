@@ -87,7 +87,7 @@ func extractReleventDirectives(userAgentBlocks map[string]string) (directives st
 
 func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
 	pattern = "^" + pattern // match start of string
-	pattern = strings.ReplaceAll(pattern, "*", ".*") //wildcard
+	pattern = strings.ReplaceAll(pattern, "*", ".+") //wildcard
 
 	regex, err = regexp.Compile(pattern)
 
