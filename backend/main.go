@@ -19,6 +19,9 @@ var albums = []album{
 }
 
 
+
+
+
 func getAlbums(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, albums)
 }

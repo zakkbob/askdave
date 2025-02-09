@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  job1:
+  go_fmt:
     name: Format Go Code (Crawler)
     runs-on: ubuntu-latest
     permissions:
@@ -37,9 +37,9 @@ jobs:
           message: 'style(crawler): formatting'
 
 
-  job2:      
+  build:      
     name: Crawler Build And Test (Go)
-    needs: job1
+    needs: go_fmt
     runs-on: ubuntu-latest
     steps:
     - name: Checkout PR branch
