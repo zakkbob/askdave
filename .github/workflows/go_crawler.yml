@@ -20,13 +20,14 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23.6'
+        check-latest: true
+        cache-dependency-path: |
+             crawler/go.sum
     
     - name: Build Crawler
-      run: |
-        cd ./crawler
-        go build -v
+      working-directory: ./crawler
+      run: go build -v
 
     - name: Test Crawler
-      run: |
-        cd ./crawler
-        go test -v
+      working-directory: ./crawler
+      run: go test -v
