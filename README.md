@@ -3,7 +3,7 @@ Why ask Google, when you can ask Dave?
 
 *WARNING - DAVE IS NOT A VERY SMART GUY*
 
---** **This Repo Has Really Cool Actions** **--
+-- **This Repo Has Really Cool Actions** --
 
 # Project Roadmap
 [Detailed Roadmap](ROADMAP.md)
