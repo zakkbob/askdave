@@ -10,7 +10,7 @@ import (
 
 type url struct {
 	protocol      string
-	subdomain     string
+	subdomain   string
 	domain        string
 	tld           string
 	port          int
