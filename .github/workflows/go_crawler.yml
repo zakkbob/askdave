@@ -10,35 +10,36 @@ on:
     branches: [ "main" ]
 
 jobs:
-  go_fmt:
+  job1:
     name: Format Go Code (Crawler)
+    runs-on: ubuntu-latest
     permissions:
       contents: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
+          # This is important to fetch the changes to the previous commit
+          fetch-depth: 0
       
-    - name: Checkout PR branch
-      uses: actions/checkout@v4
-      with:
-        # Make sure the actual branch is checked out when running on pull requests
-        ref: ${{ github.head_ref }}
-        # This is important to fetch the changes to the previous commit
-        fetch-depth: 0
-    
-    - name: Run gofmt
-      working-directory: ./crawler
-      run: go fmt .
+      - name: Run gofmt
+        working-directory: ./crawler
+        run: go fmt .
 
-    - name: Commit gofmt changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        default_author: github_actions
-        fetch: true
-        pathspec_error_handling: ignore
-        message: 'style(crawler): formatting'
+      - name: Commit gofmt changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          fetch: true
+          pathspec_error_handling: ignore
+          message: 'style(crawler): formatting'
 
 
-  build:      
+  job2:      
     name: Crawler Build And Test (Go)
-    needs: go_fmt
+    needs: job1
     runs-on: ubuntu-latest
     steps:
     - name: Checkout PR branch
