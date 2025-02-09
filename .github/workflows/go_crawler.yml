@@ -14,7 +14,10 @@ jobs:
     name: Crawler Build And Test (Go)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Go (1.23.6)
       uses: actions/setup-go@v4
@@ -42,3 +45,4 @@ jobs:
         fetch: true
         pathspec_error_handling: ignore
         message: 'style(crawler): formatting'
+        push: true
