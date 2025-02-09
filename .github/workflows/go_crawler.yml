@@ -30,7 +30,7 @@ jobs:
         cache-dependency-path: ./crawler/go.sum
 
     - name: Format code
-      uses: iamnotaturtle/auto-gofmt@v1.0
+      uses: iamnotaturtle/auto-gofmt@v2.1.0
       with:
         only_changed: True
     
