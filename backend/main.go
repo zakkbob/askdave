@@ -1,26 +1,22 @@
 package main
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type album struct {
-	ID string `json:"id"`
-	Title string `json:"title"`
-	Artist string `json:"artist"`
-	Price float64 `json:"price"`
+	ID     string  `json:"id"`
+	Title  string  `json:"title"`
+	Artist string  `json:"artist"`
+	Price  float64 `json:"price"`
 }
 
 var albums = []album{
-    {ID: "1", Title: "W album", Artist: "John Coltrane", Price: 56.99},
-    {ID: "2", Title: "Best Album", Artist: "Gerry Mulligan", Price: 17.99},
-    {ID: "3", Title: "Even better album", Artist: "Sarah Vaughan", Price: 39.99},
+	{ID: "1", Title: "W album", Artist: "John Coltrane", Price: 56.99},
+	{ID: "2", Title: "Best Album", Artist: "Gerry Mulligan", Price: 17.99},
+	{ID: "3", Title: "Even better album", Artist: "Sarah Vaughan", Price: 39.99},
 }
-
-
-
-
 
 func getAlbums(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, albums)
@@ -61,7 +57,6 @@ func deleteAlbum(context *gin.Context) {
 			return
 		}
 	}
-
 
 	context.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
