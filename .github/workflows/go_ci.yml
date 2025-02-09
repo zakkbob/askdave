@@ -41,7 +41,7 @@ jobs:
           message: 'style(golang): formatting'
 
 
-  build:      
+  build_crawler:      
     name: Crawler Build And Test (Go)
     needs: go_fmt
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       working-directory: ./crawler
       run: go test -v
   
-  build:
+  build_backend:
     name: Backend Build And Test (Go)
     needs: go_fmt
     runs-on: ubuntu-latest
