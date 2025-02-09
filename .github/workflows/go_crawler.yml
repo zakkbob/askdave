@@ -26,15 +26,6 @@ jobs:
     - name: Run gofmt
       working-directory: ./crawler
       run: go fmt .
-
-    - name: Commit gofmt changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: './crawler/'
-        default_author: github_actions
-        fetch: true
-        pathspec_error_handling: ignore
-        commit: "style(crawler): formatting"
     
     - name: Build Crawler
       working-directory: ./crawler
@@ -43,3 +34,11 @@ jobs:
     - name: Test Crawler
       working-directory: ./crawler
       run: go test -v
+
+    - name: Commit gofmt changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        default_author: github_actions
+        fetch: true
+        pathspec_error_handling: ignore
+        message: 'style(crawler): formatting'
