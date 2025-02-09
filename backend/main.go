@@ -6,8 +6,8 @@ import (
 )
 
 type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
+	ID  string  `json:"id"`
+	Title string  `json:"title"`
 	Artist string  `json:"artist"`
 	Price  float64 `json:"price"`
 }
@@ -51,7 +51,7 @@ func deleteAlbum(context *gin.Context) {
 	for i, album := range albums {
 		if album.ID == id {
 			deletedAlbum := albums[i]
-			albums[i] = albums[len(albums)-1]
+			albums[i] =albums[len(albums)-1]
 			albums = albums[:len(albums)-1]
 			context.IndentedJSON(http.StatusOK, deletedAlbum)
 			return
@@ -61,10 +61,13 @@ func deleteAlbum(context *gin.Context) {
 	context.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+
+
+
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
-	router.GET("/albums/:id", getAlbumByID)
+	router.GET("/albums/:id",    getAlbumByID)
 	router.POST("/albums", postAlbums)
 	router.DELETE("/albums/:id", deleteAlbum)
 
