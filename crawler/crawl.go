@@ -19,7 +19,7 @@ var uncrawledUrls = safeStringSlice{slice: make([]string, 0)}
 var start time.Time
 
 type page struct {
-	url           string
+	url         string
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
