@@ -3,18 +3,19 @@ Probably too detailed to be a 'roadmap' but oh well
 
 ## DaveBot (Crawler)
 **Page Discovery**
-- [ ] DaveBot can discover pages from internal links
-- [ ] DaveBot can discover pages from external links
+- [x] DaveBot can discover pages from internal links
+- [x] DaveBot can discover pages from external links
 - [ ] DaveBot can discover pages from sitemap.xml
 
 **Site Discovery**
-- [ ] DaveBot can discover new sites from external links
+- [x] DaveBot can discover new sites from external links
 
 **Dave's Integrity**
-- [ ] DaveBot respects bots.txt :D
+- [x] Davebot understands robots.txt
+- [ ] DaveBot respects robots.txt :D
 
 **Site Data Discovery**
-- [ ] DaveBot discovers page title and description from meta tags
+- [x] DaveBot discovers page title and description from meta tags
 - [ ] DaveBot can discover images on a page
 
 
