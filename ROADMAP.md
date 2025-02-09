@@ -30,7 +30,7 @@ Probably too detailed to be a 'roadmap' but oh well
 
 **Extra**
 - [ ] Daily quote (because why not)
-- [ ] Dawing of Dave (idk)
+- [ ] Drawing of Dave (idk)
 
 
 ## Dave (Backend API)
