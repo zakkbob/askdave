@@ -9,17 +9,20 @@ updates:
     directory: "/crawler/" # Location of package manifests
     schedule:
       interval: "weekly"
-    dependency-type: "all"
+    allow:
+      dependency-type: "all"
     
   - package-ecosystem: "gomod"
     directory: "/backend/" 
     schedule:
       interval: "weekly"
-    dependency-type: "all"
+    allow:
+      dependency-type: "all"
 
   - package-ecosystem: "npm"
     directory: "/frontend/"
     schedule:
       interval: "weekly"
-    dependency-type: "all"
+    allow:
+      dependency-type: "all"
     
