@@ -68,7 +68,7 @@ func extractUserAgentBlocks(content string) (blocks map[string]string) {
 	return blocks
 }
 
-func extractReleventDirectives(userAgentBlocks map[string]string) (directives string) { //Yeah yeah, i know i suck at naming things
+func extractDavebotDirectives(userAgentBlocks map[string]string) (directives string) { //Yeah yeah, i know i suck at naming things
 	userAgents := map[string]int{"*": 0, "davebot": 1, "davebot/0.1": 2} // attempts to match with most specific user agent
 
 	currentAgentAccuracy := -1
@@ -149,7 +149,7 @@ func generateUrlValidator(directives string) urlValidator {
 func ProcessRobotsTxt(content string) (validator urlValidator, sitemapUrl string) {
 	content = removeComments(content)
 	blocks := extractUserAgentBlocks(content)
-	directives := extractReleventDirectives(blocks)
+	directives := extractDavebotDirectives(blocks)
 	validator = generateUrlValidator(directives)
 
 	return validator, ""
