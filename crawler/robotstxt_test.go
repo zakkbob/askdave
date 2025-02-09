@@ -15,12 +15,12 @@ func getRobotsTxt(t *testing.T, fileName string) string {
 
 func TestExtractDavebotDirectives(t *testing.T) {
 	blocks := map[string]string{
-		"*": "Disallow: /",
+		"*":           "Disallow: /",
 		"davebot/0.1": "Allow: /Davebot0.1/",
-		"davebot": "Allow: /Davebot/",
-		"bingbot": "Disallow: /bingbot/",
+		"davebot":     "Allow: /Davebot/",
+		"bingbot":     "Disallow: /bingbot/",
 	}
-	
+
 	got := extractDavebotDirectives(blocks)
 	want := "Allow: /Davebot0.1/"
 
