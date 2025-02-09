@@ -16,6 +16,9 @@ type urlValidator struct {
 	disallowedPatterns []*regexp.Regexp
 }
 
+
+
+
 func (validator *urlValidator) validate(url string) bool {
 	longestMatch := 0
 	isValid := true
