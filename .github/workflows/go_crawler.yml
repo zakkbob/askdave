@@ -11,6 +11,7 @@ on:
 
 jobs:
   format:
+    name: Format Go Code (Crawler)
     permissions:
       contents: write
       

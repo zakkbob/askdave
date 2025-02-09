@@ -18,9 +18,9 @@ func TestUrlString(t *testing.T) {
 		},
 		url{
 			protocol: "http",
-			domain:   "example",
-			tld:      "com",
-			port:     80,
+			domain:"example",
+			tld:  "com",
+			port:  80,
 		},
 	}
 	expectedUrls := []string{
