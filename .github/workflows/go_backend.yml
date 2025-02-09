@@ -10,8 +10,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
+    name: Backend Build And Test (Go)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
