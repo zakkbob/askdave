@@ -9,7 +9,7 @@ import (
 )
 
 type url struct {
-	protocol      string
+	protocol    string
 	subdomain     string
 	domain        string
 	tld           string
