@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Crawler CI (Go)
+    name: Crawler Build And Test (Go)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
