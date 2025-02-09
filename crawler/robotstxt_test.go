@@ -11,8 +11,6 @@ func getRobotsTxt(t *testing.T) string {
 	if err != nil {
 		t.Fatalf("Failed to read file: %v", err)
 	}
-	fmt.Println(content)
-	fmt.Println(err)
 	return string(content)
 }
 
