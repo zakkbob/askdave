@@ -22,17 +22,9 @@ jobs:
         # This is important to fetch the changes to the previous commit
         fetch-depth: 0
 
-    - name: Set up Go (1.23.6)
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.23.6'
-        check-latest: true
-        cache-dependency-path: ./crawler/go.sum
-
-    - name: Format code
-      uses: iamnotaturtle/auto-gofmt@v2.1.0
-      with:
-        only_changed: True
+    - name: Run gofmt
+      working-directory: ./crawler
+      run: go fmt .
     
     - name: Build Crawler
       working-directory: ./crawler
@@ -41,3 +33,11 @@ jobs:
     - name: Test Crawler
       working-directory: ./crawler
       run: go test -v
+
+    - name: Commit gofmt changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        default_author: github_actions
+        fetch: true
+        pathspec_error_handling: ignore
+        message: 'style(crawler): formatting'
