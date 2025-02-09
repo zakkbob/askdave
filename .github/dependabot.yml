@@ -5,19 +5,38 @@
 
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    groups:
+      actions-deps:
+        patterns:
+          - "*"
+
   - package-ecosystem: "gomod" # See documentation for possible values
     directory: "/crawler/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      dev-deps:
+         dependency-type: "development"
+      prod-deps:
+         dependency-type: "production"
     
   - package-ecosystem: "gomod"
     directory: "/backend/" 
     schedule:
-      interval: "weekly"
+      interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      dev-deps:
+         dependency-type: "development"
+      prod-deps:
+         dependency-type: "production"
 
   - package-ecosystem: "npm"
     directory: "/frontend/"
@@ -25,4 +44,9 @@ updates:
       interval: "weekly"
     allow:
       - dependency-type: "all"
+    groups:
+      dev-deps:
+         dependency-type: "development"
+      prod-deps:
+         dependency-type: "production"
     
