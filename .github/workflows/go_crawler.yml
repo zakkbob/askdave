@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  format:
+  go_fmt:
     name: Format Go Code (Crawler)
     permissions:
       contents: write
@@ -38,7 +38,7 @@ jobs:
 
   build:      
     name: Crawler Build And Test (Go)
-    needs: format
+    needs: go_fmt
     runs-on: ubuntu-latest
     steps:
     - name: Checkout PR branch
