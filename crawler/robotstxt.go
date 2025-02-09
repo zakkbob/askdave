@@ -12,7 +12,7 @@ import (
 )
 
 type urlValidator struct {
-	allowedPatterns    []*regexp.Regexp
+	allowedPatterns  []*regexp.Regexp
 	disallowedPatterns []*regexp.Regexp
 }
 

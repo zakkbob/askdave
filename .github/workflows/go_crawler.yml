@@ -10,13 +10,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  format:
     permissions:
       contents: write
       
-    name: Crawler Build And Test (Go)
-    runs-on: ubuntu-latest
-    steps:
     - name: Checkout PR branch
       uses: actions/checkout@v4
       with:
@@ -24,18 +21,10 @@ jobs:
         ref: ${{ github.head_ref }}
         # This is important to fetch the changes to the previous commit
         fetch-depth: 0
-
+    
     - name: Run gofmt
       working-directory: ./crawler
       run: go fmt .
-    
-    - name: Build Crawler
-      working-directory: ./crawler
-      run: go build -v
-
-    - name: Test Crawler
-      working-directory: ./crawler
-      run: go test -v
 
     - name: Commit gofmt changes
       uses: EndBug/add-and-commit@v9
@@ -44,3 +33,20 @@ jobs:
         fetch: true
         pathspec_error_handling: ignore
         message: 'style(crawler): formatting'
+
+
+  build:      
+    name: Crawler Build And Test (Go)
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+    
+    - name: Build Crawler
+      working-directory: ./crawler
+      run: go build -v
+
+    - name: Test Crawler
+      working-directory: ./crawler
+      run: go test -v
