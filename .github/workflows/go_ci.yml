@@ -45,6 +45,8 @@ jobs:
 
   build_crawler:      
     name: Crawler Build And Test (Go)
+    permissions:
+      contents: read
     needs: go_fmt
     runs-on: ubuntu-latest
     steps:
@@ -68,6 +70,8 @@ jobs:
   
   build_backend:
     name: Backend Build And Test (Go)
+    permissions:
+      contents: read
     needs: go_fmt
     runs-on: ubuntu-latest
     steps:
