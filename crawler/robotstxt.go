@@ -12,7 +12,7 @@ import (
 )
 
 type urlValidator struct {
-	allowedPatterns    []*regexp.Regexp
+	allowedPatterns []*regexp.Regexp
 	disallowedPatterns []*regexp.Regexp
 }
 
@@ -30,7 +30,7 @@ func (validator *urlValidator) validate(url string) bool {
 			isValid = true
 		}
 	}
-	for _, pattern := range validator.disallowedPatterns {
+	for _, pattern :=   range validator.disallowedPatterns {
 		indices := pattern.FindStringIndex(url)
 		if indices == nil {
 			continue
