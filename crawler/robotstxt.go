@@ -71,15 +71,16 @@ func extractUserAgentBlocks(content string) (blocks map[string]string) {
 func extractReleventDirectives(userAgentBlocks map[string]string) (directives string) { //Yeah yeah, i know i suck at naming things
 	userAgents := map[string]int{"*": 0, "davebot": 1, "davebot/0.1": 2} // attempts to match with most specific user agent
 
-	currentAgentSpecificity := -1
+	currentAgentAccuracy := -1
 
 	for k, v := range userAgentBlocks {
-		agentSpecificity, ok := userAgents[k]
-		if !ok || agentSpecificity < currentAgentSpecificity {
+		agentAccuracy, ok := userAgents[k]
+		if !ok || agentAccuracy < currentAgentAccuracy {
 			continue
 		}
 
 		directives = v
+		currentAgentAccuracy = agentAccuracy
 	}
 
 	return directives
