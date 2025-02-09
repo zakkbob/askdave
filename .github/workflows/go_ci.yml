@@ -37,7 +37,7 @@ jobs:
         run: go fmt .
 
       - name: Commit and push changes
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@a604fba70a846a0ea59e6040ef8a4a4f95015772
         with:
           default_author: github_actions
           message: 'chore(crawler, backend): fix formatting'
@@ -45,6 +45,8 @@ jobs:
 
   build_crawler:      
     name: Crawler Build And Test (Go)
+    permissions:
+      contents: read
     needs: go_fmt
     runs-on: ubuntu-latest
     steps:
@@ -68,6 +70,8 @@ jobs:
   
   build_backend:
     name: Backend Build And Test (Go)
+    permissions:
+      contents: read
     needs: go_fmt
     runs-on: ubuntu-latest
     steps:
