@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     name: Frontend Build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     strategy:
