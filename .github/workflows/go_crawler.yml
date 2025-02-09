@@ -17,6 +17,9 @@ jobs:
     - name: Checkout PR branch
       uses: actions/checkout@v4
       with:
+        # Make sure the actual branch is checked out when running on pull requests
+        ref: ${{ github.head_ref }}
+        # This is important to fetch the changes to the previous commit
         fetch-depth: 0
 
     - name: Set up Go (1.23.6)
@@ -26,9 +29,10 @@ jobs:
         check-latest: true
         cache-dependency-path: ./crawler/go.sum
 
-    - name: Run gofmt
-      working-directory: ./crawler
-      run: go fmt .
+    - name: Format code
+      uses: iamnotaturtle/auto-gofmt@v1.0
+      with:
+        only_changed: True
     
     - name: Build Crawler
       working-directory: ./crawler
@@ -37,12 +41,3 @@ jobs:
     - name: Test Crawler
       working-directory: ./crawler
       run: go test -v
-
-    - name: Commit gofmt changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        default_author: github_actions
-        fetch: true
-        pathspec_error_handling: ignore
-        message: 'style(crawler): formatting'
-        push: true
