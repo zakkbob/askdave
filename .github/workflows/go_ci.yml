@@ -38,7 +38,7 @@ jobs:
           default_author: github_actions
           fetch: true
           pathspec_error_handling: ignore
-          message: 'style(golang): formatting'
+          message: 'style(crawler, backend): format with gofmt'
 
 
   build_crawler:      
