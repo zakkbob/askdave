@@ -6,6 +6,7 @@ package main
 
 import (
 	"strconv"
+	"sync"
 )
 
 type url struct {
@@ -16,6 +17,11 @@ type url struct {
 	port          int
 	path          []string
 	trailingSlash bool
+}
+
+type safeUrlSlice struct {
+	mutex sync.Mutex
+	slice []url
 }
 
 func (u *url) String() string {

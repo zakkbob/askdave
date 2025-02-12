@@ -1,10 +1,5 @@
 package main
 
-include (
-	"fmt"
-)
-
-
 type crawlRequestType int
 
 const (
