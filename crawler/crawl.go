@@ -10,32 +10,23 @@ import (
 	"time"
 )
 
-var crawledPages = safePageSlice{slice: make([]page, 0)}
-
-var discoveredUrls = safeStringSlice{slice: make([]string, 0)}
-var crawledUrls = safeStringSlice{slice: make([]string, 0)}
-var uncrawledUrls = safeStringSlice{slice: make([]string, 0)}
-
-var start time.Time
-
-type page struct {
-	url           string
+type pageCrawl struct {
+	url url
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
 	ogSiteName    string
-	links         []string
+	links         []url
 }
 
-type safeStringSlice struct {
+type safePageCrawlSlice struct {
 	mutex sync.Mutex
 	slice []string
 }
 
-type safePageSlice struct {
-	mutex sync.Mutex
-	slice []page
-}
+var uncrawledUrls = safeUrlSlice{slice: make([]url, 0)}
+var pageCrawls = safePageCrawlSlice{slice: make([]pageCrawl, 0)}
+
 
 func getAbsoluteUrl(url string, pageUrl string) (absoluteUrl string) { //Converts relative urls to fully qualified
 	if len(url) == 0 { //what the frick happened here
