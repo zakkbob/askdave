@@ -1,13 +1,13 @@
 package main
 
 import (
-// 	"fmt"
-// 	"io"
-// 	"net/http"
-// 	"regexp"
-// 	"slices"
- 	"sync"
-// 	"time"
+	// 	"fmt"
+	// 	"io"
+	// 	"net/http"
+	// 	"regexp"
+	// 	"slices"
+	"sync"
+	// "time"
 )
 
 type safeStringSlice struct {
@@ -16,7 +16,7 @@ type safeStringSlice struct {
 }
 
 type pageCrawl struct {
-	url url
+	url           url
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
@@ -28,9 +28,9 @@ type safePageCrawlSlice struct {
 	mutex sync.Mutex
 	slice []pageCrawl
 }
+
 var crawledUrls = safeUrlSlice{slice: make([]url, 0)}
 var pageCrawls = safePageCrawlSlice{slice: make([]pageCrawl, 0)}
-
 
 // func getAbsoluteUrl(url string, pageUrl string) (absoluteUrl string) { //Converts relative urls to fully qualified
 // 	if len(url) == 0 { //what the frick happened here
