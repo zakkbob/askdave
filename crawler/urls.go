@@ -80,60 +80,9 @@ func (u *url) String() string {
 	return s
 }
 
-func parseAbsoluteUrl(s string) (url, error) { //omg, a function inside a function :shock: thisll be fun to debug :big_shock:
+func parseAbsoluteUrl(s string) (url, error) {
 	original_s := s
 	var parsed url
-
-	// type dodgyFunc func(match string) error
-
-	// testRegex := func(expr string, callback dodgyFunc) (matched bool, err error) {
-	// 	regex := regexp.MustCompile(expr)
-	// 	matches := regex.FindStringSubmatch(s)
-
-	// 	if len(matches) > 2 {
-	// 		err = callback(matches[1])
-	// 		if err{
-	// 			return false, err
-	// 		}
-	// 		s = matches[2]
-	// 		return true, nil
-	// 	} else {
-	// 		return false, nil
-	// 	}
-	// }
-
-	// testRegex("^(https?):\\/\\/(.*)", dodgyFunc{
-	// 	parsed.protocol = stringToProtocol(match)
-	// })
-
-	// testRegex("^(.+?)\\.(.*?\\..*)", dodgyFunc{
-	// 	parsed.subdomain = match
-	// })
-
-	// if !testRegex("^(.+?)\\.(.*)", dodgyFunc{
-	// 	parsed.domain = match
-	// }){
-	// 	return parsed, fmt.Errorf("url: '%s' does not contain a domain!", original_s)
-	// }
-
-	// if !testRegex("^(.+?)([/:].*)?$", dodgyFunc{
-	// 	parsed.tld = match
-	// }){
-	// 	return parsed, fmt.Errorf("url: '%s' does not contain a tld!", original_s)
-	// }
-
-	// return testRegex("^:(.+?)(\\/.*)?$", dodgyFunc{
-	// 	port, err := strconv.Atoi(match)
-	// 	if err != nil{
-	// 		return parsed, fmt.Errorf("malformed port: '%s' is not a valid port. (%s)", match, err.Error())
-	// 	}
-	// 	parsed.port = port
-	// })
-	
-	// testRegex("^\\/(.+?)(\\/)?$", dodgyFunc{
-	// 	path := strings.Split(pathMatches[1], "/")
-	// 	parsed.path = path
-	// })
 
 	protocolRegex := regexp.MustCompile("^(https?):\\/\\/(.*)")
 	protocolMatches := protocolRegex.FindStringSubmatch(s)
