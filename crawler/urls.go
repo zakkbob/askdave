@@ -93,7 +93,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = protocolMatches[2] //remove the protocol to simplify future regex (this pattern repeats btw)
 	}
 
-	subdomainRegex := regexp.MustCompile("^(.+?)\\.(.*?\\..*)")
+	subdomainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.(.*?\\..*)")
 	subdomainMatches := subdomainRegex.FindStringSubmatch(s)
 
 	if len(subdomainMatches) > 2 {
@@ -102,7 +102,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = subdomainMatches[2] //see what i mean
 	}
 
-	domainRegex := regexp.MustCompile("^(.+?)\\.(.*)")
+	domainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.(.*)")
 	domainMatches := domainRegex.FindStringSubmatch(s)
 
 	if len(domainMatches) > 2 {
@@ -113,7 +113,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		return parsed, fmt.Errorf("url: '%s' does not contain a domain!", original_s)
 	}
 
-	tldRegex := regexp.MustCompile("^(.+?)([/:].*)?$")
+	tldRegex := regexp.MustCompile("^([a-z0-9-]+?)([/:].*)?$")
 	tldMatches := tldRegex.FindStringSubmatch(s)
 
 	if len(tldMatches) > 2 {
@@ -151,4 +151,66 @@ func parseAbsoluteUrl(s string) (url, error) {
 	}
 
 	return parsed, nil
+}
+
+func normalisePath(p []string) ([]string) {
+	var n []string
+	for _, segment := range p {
+		switch segment{
+		case ".":
+			continue
+		case "..":
+			if len(n) != 0{
+				n = n[:len(n)-1]
+			}
+		default:
+			n = append(n, segment)
+		}
+	}
+	return n
+}
+
+func normaliseUrl(u url) url {
+	u.path = normalisePath(u.path)
+	length := len(u.path)
+	if length == 0 {
+		return u
+	}
+
+	if u.path[length-1] == ""{
+		u.path = u.path[:length-1]
+		u.trailingSlash = true
+	}
+	return u
+}
+
+func parseRelativeUrl(s string, base url) (url, error) {
+	absUrl, err := parseAbsoluteUrl(s)
+	
+	if err == nil && absUrl.protocol != UnspecifiedProtocol{
+		return absUrl, nil
+	}
+
+	regex := regexp.MustCompile("(\\.?\\.?\\/)?(.+)")
+	matches := regex.FindStringSubmatch(s)
+
+	if len(matches) < 3 {
+		return url{}, fmt.Errorf("invalid relative url: %s", s)
+	}
+
+
+	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
+		path := strings.Split(matches[0], "/")
+		base.path = normalisePath(append(base.path, path...))
+		return normaliseUrl(base), nil
+	} else if matches[1] == "/" {
+		base.path = strings.Split(matches[2], "/")
+		return normaliseUrl(base), nil
+	}
+
+	if err != nil {
+		return absUrl, nil
+	}
+
+	return url{}, fmt.Errorf("invalid relative url: %s", s)
 }
