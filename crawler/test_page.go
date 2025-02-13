@@ -10,8 +10,8 @@ func TestAddLink(t *testing.T) {
 	u, _ := parseAbsoluteUrl(expected)
 	p.addLink(u)
 	got := p.links[0].String()
-	if got != expected{
+	if got != expected {
 		t.Errorf("got '%s', expected '%s'", got, expected)
 	}
-	
+
 }
