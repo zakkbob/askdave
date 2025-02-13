@@ -24,7 +24,6 @@ type safePageSlice struct {
 	slice []page
 }
 
-
 var crawledPages = safePageSlice{slice: make([]page, 0)}
 var crawlTasks = safeCrawlTaskSlice{slice: make([]crawlTask, 0)}
 
