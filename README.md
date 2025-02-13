@@ -1,3 +1,5 @@
+!! This project is under heavy development and does not work yet !!
+
 # AskDave
 Why ask Google, when you can ask Dave?
 
