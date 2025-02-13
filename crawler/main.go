@@ -6,7 +6,7 @@ import (
 // "time"
 )
 
-// func main() {
+func main() {
 // 	start = time.Now()
 
 // 	var wg sync.WaitGroup
@@ -68,4 +68,4 @@ import (
 // 	//fmt.Println(crawledPages)
 // 	fmt.Println(len(crawledUrls.slice), "Crawled")
 // 	fmt.Println(len(uncrawledUrls.slice), "Uncrawled")
-// }
+}
