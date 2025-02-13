@@ -7,7 +7,7 @@ import (
 func TestUrlString(t *testing.T) {
 	testUrls := []url{
 		url{
-			"https", "www", "example", "com", 8080,
+			HttpsProtocol, "www", "example", "com", 8080,
 			[]string{
 				"privacy",
 			}, true,
@@ -17,7 +17,7 @@ func TestUrlString(t *testing.T) {
 			tld:    "com",
 		},
 		url{
-			protocol: "http",
+			protocol: HttpProtocol,
 			domain:   "example",
 			tld:      "com",
 			port:     80,
@@ -32,6 +32,29 @@ func TestUrlString(t *testing.T) {
 	for i, u := range testUrls {
 		got := u.String()
 		expected := expectedUrls[i]
+		if got != expected {
+			t.Errorf("got '%s', expected '%s'", got, expected)
+		}
+	}
+}
+
+func TestStringToUrl(t *testing.T) {
+	testStrings := []string{
+		"https://www.google.com:1234/privacy-policy/help/",
+		"http://www.google.com:1234/",
+		"https://www.google.com:1234",
+		"www.google.com/privacy-policy/help",
+		"google.com/privacy-policy/help",
+		"http://google.com/privacy-policy/",
+	}	
+
+	for _, expected := range testStrings {
+		parsed, err := parseAbsoluteUrl(expected)
+		if err != nil {
+			t.Errorf(err.Error())
+			continue
+		}
+		got := parsed.String()
 		if got != expected {
 			t.Errorf("got '%s', expected '%s'", got, expected)
 		}
