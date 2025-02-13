@@ -1,3 +1,7 @@
+//-------------------------------//
+// Works through all crawl tasks //
+//-------------------------------//
+
 package main
 
 import (
@@ -6,23 +10,9 @@ import (
 	// "net/http"
 	// "regexp"
 	// "slices"
-	"sync"
+	// "sync"
 	// "time"
 )
-
-type page struct {
-	url           string
-	pageTitle     string
-	ogTitle       string
-	ogDescription string
-	ogSiteName    string
-	links         []string
-}
-
-type safePageSlice struct {
-	mutex sync.Mutex
-	slice []page
-}
 
 var crawledPages = safePageSlice{slice: make([]page, 0)}
 var crawlTasks = safeCrawlTaskSlice{slice: make([]crawlTask, 0)}
