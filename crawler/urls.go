@@ -153,14 +153,14 @@ func parseAbsoluteUrl(s string) (url, error) {
 	return parsed, nil
 }
 
-func normalisePath(p []string) ([]string) {
+func normalisePath(p []string) []string {
 	var n []string
 	for _, segment := range p {
-		switch segment{
+		switch segment {
 		case ".":
 			continue
 		case "..":
-			if len(n) != 0{
+			if len(n) != 0 {
 				n = n[:len(n)-1]
 			}
 		default:
@@ -177,7 +177,7 @@ func normaliseUrl(u url) url {
 		return u
 	}
 
-	if u.path[length-1] == ""{
+	if u.path[length-1] == "" {
 		u.path = u.path[:length-1]
 		u.trailingSlash = true
 	}
@@ -186,8 +186,8 @@ func normaliseUrl(u url) url {
 
 func parseRelativeUrl(s string, base url) (url, error) {
 	absUrl, err := parseAbsoluteUrl(s)
-	
-	if err == nil && absUrl.protocol != UnspecifiedProtocol{
+
+	if err == nil && absUrl.protocol != UnspecifiedProtocol {
 		return absUrl, nil
 	}
 
@@ -197,7 +197,6 @@ func parseRelativeUrl(s string, base url) (url, error) {
 	if len(matches) < 3 {
 		return url{}, fmt.Errorf("invalid relative url: %s", s)
 	}
-
 
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
 		path := strings.Split(matches[0], "/")

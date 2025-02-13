@@ -5,11 +5,11 @@
 package main
 
 import (
-	"io"
-	"sync"
 	"fmt"
-	"regexp"
+	"io"
 	"net/http"
+	"regexp"
+	"sync"
 )
 
 type page struct {
@@ -30,7 +30,6 @@ func (p *page) addLink(u url) {
 	p.links = append(p.links, u)
 }
 
-
 func crawlPage(u url) (page, error) {
 	b, err := fetchPageBody(u)
 
@@ -46,7 +45,7 @@ func parseBody(b string, u url) (page, error) {
 	p.ogTitle = extractBodyMeta(b, "title")
 	p.ogDescription = extractBodyMeta(b, "description")
 	p.ogSiteName = extractBodyMeta(b, "site_name")
-	
+
 	p.pageTitle = extractBodyTitle(b)
 
 	p.links = extractBodyLinks(b, u)
