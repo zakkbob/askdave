@@ -1,11 +1,11 @@
-package main
+package urls
 
 import (
 	"testing"
 )
 
 func TestUrlString(t *testing.T) {
-	testUrls := []url{
+	testUrls := []Url{
 		{
 			HttpsProtocol, "www", "example", "com", 8080,
 			[]string{
@@ -50,7 +50,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 	}
 
 	for _, expected := range testStrings {
-		parsed, err := parseAbsoluteUrl(expected)
+		parsed, err := ParseAbsoluteUrl(expected)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -63,7 +63,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 }
 
 func TestParseRelativeUrl(t *testing.T) {
-	baseUrl, _ := parseAbsoluteUrl("example.com/subdir")
+	baseUrl, _ := ParseAbsoluteUrl("example.com/subdir")
 
 	testStrings := []string{
 		"home.php",
@@ -88,7 +88,7 @@ func TestParseRelativeUrl(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := parseRelativeUrl(testString, baseUrl)
+		parsed, err := ParseRelativeUrl(testString, baseUrl)
 		if err != nil {
 			t.Error(err.Error())
 			continue

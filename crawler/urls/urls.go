@@ -2,7 +2,7 @@
 // Processes urls into a struct (for consistent formatting) //
 //----------------------------------------------------------//
 
-package main
+package urls
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ const (
 	HttpsProtocol
 )
 
-type url struct {
+type Url struct {
 	protocol      Protocol //optional (default Unspecified)
 	subdomain     string   //optional (default none)
 	domain        string   //required
@@ -49,11 +49,11 @@ func stringToProtocol(s string) Protocol {
 	return stringProtocolMap[s]
 }
 
-func (u *url) protocolString() string {
+func (u *Url) ProtocolString() string {
 	return protocolToString(u.protocol)
 }
 
-func (u *url) pathString() string {
+func (u *Url) PathString() string {
 	s := ""
 	for _, p := range u.path {
 		s += "/" + p
@@ -61,7 +61,19 @@ func (u *url) pathString() string {
 	return s
 }
 
-func (u *url) String() string {
+func (u *Url) Subdomain() string {
+	return u.subdomain
+}
+
+func (u *Url) Domain() string {
+	return u.domain
+}
+
+func (u *Url) Tld() string {
+	return u.tld
+}
+
+func (u *Url) String() string {
 	s := ""
 
 	if u.protocol != UnspecifiedProtocol {
@@ -80,7 +92,7 @@ func (u *url) String() string {
 	}
 
 	if len(u.path) != 0 {
-		s += u.pathString()
+		s += u.PathString()
 	}
 
 	if u.trailingSlash {
@@ -90,9 +102,9 @@ func (u *url) String() string {
 	return s
 }
 
-func parseAbsoluteUrl(s string) (url, error) {
+func ParseAbsoluteUrl(s string) (Url, error) {
 	original_s := s
-	var parsed url
+	var parsed Url
 
 	protocolRegex := regexp.MustCompile(`^(https?):\/\/(.*)`)
 	protocolMatches := protocolRegex.FindStringSubmatch(s)
@@ -180,7 +192,7 @@ func normalisePath(p []string) []string {
 	return n
 }
 
-func normaliseUrl(u url) url {
+func normaliseUrl(u Url) Url {
 	u.path = normalisePath(u.path)
 	length := len(u.path)
 	if length == 0 {
@@ -194,8 +206,8 @@ func normaliseUrl(u url) url {
 	return u
 }
 
-func parseRelativeUrl(s string, base url) (url, error) {
-	absUrl, err := parseAbsoluteUrl(s)
+func ParseRelativeUrl(s string, base Url) (Url, error) {
+	absUrl, err := ParseAbsoluteUrl(s)
 
 	if err == nil && absUrl.protocol != UnspecifiedProtocol {
 		return absUrl, nil
@@ -205,7 +217,7 @@ func parseRelativeUrl(s string, base url) (url, error) {
 	matches := regex.FindStringSubmatch(s)
 
 	if len(matches) < 3 {
-		return url{}, fmt.Errorf("invalid relative url: %s", s)
+		return Url{}, fmt.Errorf("invalid relative url: %s", s)
 	}
 
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
@@ -221,5 +233,5 @@ func parseRelativeUrl(s string, base url) (url, error) {
 		return absUrl, nil
 	}
 
-	return url{}, fmt.Errorf("invalid relative url: %s", s)
+	return Url{}, fmt.Errorf("invalid relative url: %s", s)
 }

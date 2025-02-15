@@ -2,7 +2,7 @@
 // Processes robots.txt into a struct //
 //------------------------------------//
 
-package main
+package robots
 
 import (
 	"bufio"
@@ -11,12 +11,12 @@ import (
 	"strings"
 )
 
-type urlValidator struct {
+type UrlValidator struct {
 	allowedPatterns    []*regexp.Regexp
 	disallowedPatterns []*regexp.Regexp
 }
 
-func (validator *urlValidator) validate(url string) bool {
+func (validator *UrlValidator) validate(url string) bool {
 	longestMatch := 0
 	isValid := true
 	for _, pattern := range validator.allowedPatterns {
@@ -110,8 +110,8 @@ func removeComments(s string) string {
 	return noComments
 }
 
-func generateUrlValidator(directives string) urlValidator {
-	validator := urlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
+func generateUrlValidator(directives string) UrlValidator {
+	validator := UrlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
 
 	scanner := bufio.NewScanner(strings.NewReader(directives))
 	directiveRegex := regexp.MustCompile("(?i)(.*?):(.*)")
@@ -146,7 +146,7 @@ func generateUrlValidator(directives string) urlValidator {
 	return validator
 }
 
-func ProcessRobotsTxt(content string) (validator urlValidator, sitemapUrl string) {
+func ProcessRobotsTxt(content string) (validator UrlValidator, sitemapUrl string) {
 	content = removeComments(content)
 	blocks := extractUserAgentBlocks(content)
 	directives := extractDavebotDirectives(blocks)

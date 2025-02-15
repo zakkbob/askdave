@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ZakkBob/AskDave/crawler/urls"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,12 +9,12 @@ import (
 )
 
 type fetcher interface {
-	fetch(url) (string, error)
+	fetch(urls.Url) (string, error)
 }
 
 type netFetcher struct{}
 
-func (*netFetcher) fetch(u url) (string, error) {
+func (*netFetcher) fetch(u urls.Url) (string, error) {
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return "", err
@@ -30,14 +31,14 @@ type dummyFetcher struct {
 	response string
 }
 
-func (d *dummyFetcher) fetch(u url) (string, error) {
+func (d *dummyFetcher) fetch(u urls.Url) (string, error) {
 	return d.response, nil
 }
 
 type fileFetcher struct{}
 
-func (f *fileFetcher) fetch(u url) (string, error) {
-	path := u.protocolString() + "/" + u.subdomain + "." + u.domain + "." + u.tld + u.pathString()
+func (f *fileFetcher) fetch(u urls.Url) (string, error) {
+	path := u.ProtocolString() + "/" + u.Subdomain() + "." + u.Domain() + "." + u.Tld() + u.PathString()
 	content, err := os.ReadFile("testdata/sites/" + path)
 	if err != nil {
 		return "", fmt.Errorf("Failed to read file: %v", err)

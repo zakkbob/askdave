@@ -5,6 +5,7 @@
 package main
 
 import (
+	"ZakkBob/AskDave/crawler/urls"
 	"sync"
 )
 
@@ -28,5 +29,5 @@ import (
 
 type safeUrlSlice struct {
 	mu    sync.Mutex
-	slice []url
+	slice []urls.Url
 }

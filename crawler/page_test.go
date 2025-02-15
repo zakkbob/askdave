@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ZakkBob/AskDave/crawler/urls"
 	"fmt"
 	"os"
 	"testing"
@@ -9,7 +10,7 @@ import (
 func TestAddLink(t *testing.T) {
 	var p page
 	expected := "https://google.com"
-	u, _ := parseAbsoluteUrl(expected)
+	u, _ := urls.ParseAbsoluteUrl(expected)
 	p.addLink(u)
 	got := p.links[0].String()
 	if got != expected {
@@ -27,7 +28,7 @@ func readPageFile(t *testing.T, n int) string {
 
 func TestParseBody(t *testing.T) {
 	b := readPageFile(t, 1)
-	u, _ := parseAbsoluteUrl("https://www.example.com/home")
+	u, _ := urls.ParseAbsoluteUrl("https://www.example.com/home")
 	p, err := parseBody(b, u)
 
 	if err != nil {

@@ -5,6 +5,8 @@
 package main
 
 import (
+	"ZakkBob/AskDave/crawler/robots"
+	"ZakkBob/AskDave/crawler/urls"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -18,7 +20,7 @@ type tasks struct {
 }
 
 type results struct {
-	robots   map[string]urlValidator
+	robots   map[string]robots.UrlValidator
 	sitemaps map[string]string
 	pages    map[string]page
 }
@@ -88,17 +90,17 @@ func (r *taskRunner) completeNextPageTask() bool {
 	return false
 }
 
-func completeRobotsCrawl(u url) {
+func completeRobotsCrawl(u urls.Url) {
 	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
 	fmt.Printf("Crawled robots.txt '%s'\n", u.String())
 }
 
-func completeSitemapCrawl(u url) {
+func completeSitemapCrawl(u urls.Url) {
 	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
 	fmt.Printf("Crawled sitemap '%s'\n", u.String())
 }
 
-func completePageCrawl(u url) {
+func completePageCrawl(u urls.Url) {
 	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
 	fmt.Printf("Crawled page '%s'\n", u.String())
 }

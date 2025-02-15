@@ -5,6 +5,7 @@
 package main
 
 import (
+	"ZakkBob/AskDave/crawler/urls"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,12 +14,12 @@ import (
 )
 
 type page struct {
-	u             url
+	u             urls.Url
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
 	ogSiteName    string
-	links         []url
+	links         []urls.Url
 }
 
 type safePageSlice struct {
@@ -26,11 +27,11 @@ type safePageSlice struct {
 	slice []page
 }
 
-func (p *page) addLink(u url) {
+func (p *page) addLink(u urls.Url) {
 	p.links = append(p.links, u)
 }
 
-func crawlPage(u url) (page, error) {
+func crawlPage(u urls.Url) (page, error) {
 	b, err := fetchPageBody(u)
 
 	if err != nil {
@@ -43,7 +44,7 @@ func crawlPage(u url) (page, error) {
 	return p, err
 }
 
-func parseBody(b string, u url) (page, error) {
+func parseBody(b string, u urls.Url) (page, error) {
 	var p page
 	p.ogTitle = extractBodyMeta(b, "title")
 	p.ogDescription = extractBodyMeta(b, "description")
@@ -56,7 +57,7 @@ func parseBody(b string, u url) (page, error) {
 	return p, nil
 }
 
-func fetchPageBody(u url) (string, error) {
+func fetchPageBody(u urls.Url) (string, error) {
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return "", err
@@ -103,13 +104,13 @@ func extractBodyTitle(page string) (pageTitle string) {
 	return pageTitle
 }
 
-func extractBodyLinks(body string, pageUrl url) (pageLinks []url) {
+func extractBodyLinks(body string, pageUrl urls.Url) (pageLinks []urls.Url) {
 	linkElRegex := regexp.MustCompile("(?s)<a.*?>") //Wont match if '>' is in the tag somewher :shruggie:
 	linkHrefRegex := regexp.MustCompile("(?s)href=\"(.*?)\"")
 
 	elMatches := linkElRegex.FindAllString(body, -1)
 	if len(elMatches) < 1 {
-		return []url{}
+		return []urls.Url{}
 	}
 
 	for _, linkEl := range elMatches {
@@ -118,7 +119,7 @@ func extractBodyLinks(body string, pageUrl url) (pageLinks []url) {
 			continue
 		}
 
-		linkUrl, err := parseRelativeUrl(hrefMatches[1], pageUrl)
+		linkUrl, err := urls.ParseRelativeUrl(hrefMatches[1], pageUrl)
 
 		if err != nil {
 			fmt.Println(err.Error())
