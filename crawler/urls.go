@@ -49,6 +49,18 @@ func stringToProtocol(s string) Protocol {
 	return stringProtocolMap[s]
 }
 
+func (u *url) protocolString() string {
+	return protocolToString(u.protocol)
+}
+
+func (u *url) pathString() string {
+	s := ""
+	for _, p := range u.path {
+		s += "/" + p
+	}
+	return s
+}
+
 func (u *url) String() string {
 	s := ""
 
@@ -68,9 +80,7 @@ func (u *url) String() string {
 	}
 
 	if len(u.path) != 0 {
-		for _, p := range u.path {
-			s += "/" + p
-		}
+		s += u.pathString()
 	}
 
 	if u.trailingSlash {
