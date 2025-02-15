@@ -13,7 +13,7 @@ import (
 )
 
 type page struct {
-	url           string
+	u             url
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
@@ -34,10 +34,13 @@ func crawlPage(u url) (page, error) {
 	b, err := fetchPageBody(u)
 
 	if err != nil {
-		return page{}, err
+		return page{u: u}, err
 	}
 
-	return parseBody(b, u)
+	p, err := parseBody(b, u)
+	p.u = u
+
+	return p, err
 }
 
 func parseBody(b string, u url) (page, error) {

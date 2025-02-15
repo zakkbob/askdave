@@ -6,17 +6,17 @@ import (
 
 func TestUrlString(t *testing.T) {
 	testUrls := []url{
-		url{
+		{
 			HttpsProtocol, "www", "example", "com", 8080,
 			[]string{
 				"privacy",
 			}, true,
 		},
-		url{
+		{
 			domain: "example",
 			tld:    "com",
 		},
-		url{
+		{
 			protocol: HttpProtocol,
 			domain:   "example",
 			tld:      "com",
@@ -52,7 +52,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 	for _, expected := range testStrings {
 		parsed, err := parseAbsoluteUrl(expected)
 		if err != nil {
-			t.Errorf(err.Error())
+			t.Error(err.Error())
 			continue
 		}
 		got := parsed.String()
@@ -90,7 +90,7 @@ func TestParseRelativeUrl(t *testing.T) {
 	for i, testString := range testStrings {
 		parsed, err := parseRelativeUrl(testString, baseUrl)
 		if err != nil {
-			t.Errorf(err.Error())
+			t.Error(err.Error())
 			continue
 		}
 		got := parsed.String()

@@ -84,7 +84,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 	original_s := s
 	var parsed url
 
-	protocolRegex := regexp.MustCompile("^(https?):\\/\\/(.*)")
+	protocolRegex := regexp.MustCompile(`^(https?):\/\/(.*)`)
 	protocolMatches := protocolRegex.FindStringSubmatch(s)
 
 	if len(protocolMatches) > 2 {
@@ -93,7 +93,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = protocolMatches[2] //remove the protocol to simplify future regex (this pattern repeats btw)
 	}
 
-	subdomainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.([a-z0-9-]*?\\..*)")
+	subdomainRegex := regexp.MustCompile(`^([a-z0-9-]+?)\.([a-z0-9-]*?\..*)`)
 	subdomainMatches := subdomainRegex.FindStringSubmatch(s)
 
 	if len(subdomainMatches) > 2 {
@@ -102,7 +102,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = subdomainMatches[2] //see what i mean
 	}
 
-	domainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.(.*)")
+	domainRegex := regexp.MustCompile(`^([a-z0-9-]+?)\.(.*)`)
 	domainMatches := domainRegex.FindStringSubmatch(s)
 
 	if len(domainMatches) > 2 {
@@ -110,10 +110,10 @@ func parseAbsoluteUrl(s string) (url, error) {
 		parsed.domain = domain
 		s = domainMatches[2]
 	} else {
-		return parsed, fmt.Errorf("url: '%s' does not contain a domain!", original_s)
+		return parsed, fmt.Errorf("url: '%s' does not contain a domain", original_s)
 	}
 
-	tldRegex := regexp.MustCompile("^([a-z0-9-]+?)([/:].*)?$")
+	tldRegex := regexp.MustCompile(`^([a-z0-9-]+?)([/:].*)?$`)
 	tldMatches := tldRegex.FindStringSubmatch(s)
 
 	if len(tldMatches) > 2 {
@@ -121,10 +121,10 @@ func parseAbsoluteUrl(s string) (url, error) {
 		parsed.tld = tld
 		s = tldMatches[2]
 	} else {
-		return parsed, fmt.Errorf("url: '%s' does not contain a tld!", original_s)
+		return parsed, fmt.Errorf("url: '%s' does not contain a tld", original_s)
 	}
 
-	portRegex := regexp.MustCompile("^:(.+?)(\\/.*)?$")
+	portRegex := regexp.MustCompile(`^:(.+?)(\/.*)?$`)
 	portMatches := portRegex.FindStringSubmatch(s)
 
 	if len(portMatches) > 2 {
@@ -136,7 +136,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = portMatches[2]
 	}
 
-	pathRegex := regexp.MustCompile("^\\/(.+?)(\\/)?$")
+	pathRegex := regexp.MustCompile(`^\/(.+?)(\/)?$`)
 	pathMatches := pathRegex.FindStringSubmatch(s)
 
 	if len(pathMatches) > 2 {
@@ -191,7 +191,7 @@ func parseRelativeUrl(s string, base url) (url, error) {
 		return absUrl, nil
 	}
 
-	regex := regexp.MustCompile("(\\.?\\.?\\/)?(.+)")
+	regex := regexp.MustCompile(`(\.?\.?\/)?(.+)`)
 	matches := regex.FindStringSubmatch(s)
 
 	if len(matches) < 3 {
