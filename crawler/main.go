@@ -3,38 +3,29 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"sync"
 )
 
 func main() {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 25; i++ {
 		s := "https://example.com/robots.txt" + strconv.Itoa(i)
 
 		u, _ := parseAbsoluteUrl(s)
 		robotsCrawlTasks.slice = append(robotsCrawlTasks.slice, u)
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 25; i++ {
 		u, _ := parseAbsoluteUrl(fmt.Sprintf("https://example.com/sitemap%d.xml", i))
 		sitemapCrawlTasks.slice = append(sitemapCrawlTasks.slice, u)
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 25; i++ {
 		u, _ := parseAbsoluteUrl(fmt.Sprintf("https://example.com/page%d.html", i))
 		pageCrawlTasks.slice = append(pageCrawlTasks.slice, u)
 	}
 
-	var wg sync.WaitGroup
-
-	for range 15 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			completeNextTask()
-		}()
-	}
-
-	wg.Wait()
+	loopConcurrently(completeNextRobotsTask, 10)
+	loopConcurrently(completeNextSitemapTask, 10)
+	loopConcurrently(completeNextPageTask, 10)
 
 	// 	start = time.Now()
 
