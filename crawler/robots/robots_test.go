@@ -6,7 +6,7 @@ import (
 )
 
 func readRobotsTxt(t *testing.T, fileName string) string {
-	content, err := os.ReadFile("testdata/" + fileName)
+	content, err := os.ReadFile("../testdata/" + fileName)
 	if err != nil {
 		t.Fatalf("Failed to read file: %v", err)
 	}

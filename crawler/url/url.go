@@ -2,7 +2,7 @@
 // Processes urls into a struct (for consistent formatting) //
 //----------------------------------------------------------//
 
-package urls
+package url
 
 import (
 	"fmt"
@@ -20,13 +20,13 @@ const (
 )
 
 type Url struct {
-	protocol      Protocol //optional (default Unspecified)
-	subdomain     string   //optional (default none)
-	domain        string   //required
-	tld           string   //required
-	port          int      //optional (default based on protocol)
-	path          []string //optional (default empty)
-	trailingSlash bool     //optional (default false)
+	Protocol      Protocol //optional (default Unspecified)
+	Subdomain     string   //optional (default none)
+	Domain        string   //required (unless ip is used)
+	Tld           string   //required (unless ip is used)
+	Port          int      //optional (default based on protocol)
+	Path          []string //optional (default empty)
+	TrailingSlash bool     //optional (default false)
 }
 
 var protocolStringMap = map[Protocol]string{
@@ -50,52 +50,53 @@ func stringToProtocol(s string) Protocol {
 }
 
 func (u *Url) ProtocolString() string {
-	return protocolToString(u.protocol)
+	return protocolToString(u.Protocol)
 }
 
 func (u *Url) PathString() string {
 	s := ""
-	for _, p := range u.path {
+	for _, p := range u.Path {
 		s += "/" + p
 	}
 	return s
 }
 
-func (u *Url) Subdomain() string {
-	return u.subdomain
-}
+func (u *Url) FQDN() string {
+	s := ""
 
-func (u *Url) Domain() string {
-	return u.domain
-}
+	if u.Subdomain != "" {
+		s += u.Subdomain + "."
+	}
 
-func (u *Url) Tld() string {
-	return u.tld
+	s += u.Domain + "."
+	s += u.Tld
+
+	return s
 }
 
 func (u *Url) String() string {
 	s := ""
 
-	if u.protocol != UnspecifiedProtocol {
-		s += protocolToString(u.protocol) + "://"
+	if u.Protocol != UnspecifiedProtocol {
+		s += protocolToString(u.Protocol) + "://"
 	}
 
-	if u.subdomain != "" {
-		s += u.subdomain + "."
+	if u.Subdomain != "" {
+		s += u.Subdomain + "."
 	}
 
-	s += u.domain + "."
-	s += u.tld
+	s += u.Domain + "."
+	s += u.Tld
 
-	if (u.port != 0) && !(u.protocol == HttpProtocol && u.port == 80) && !(u.protocol == HttpsProtocol && u.port == 443) {
-		s += ":" + strconv.Itoa(u.port)
+	if (u.Port != 0) && !(u.Protocol == HttpProtocol && u.Port == 80) && !(u.Protocol == HttpsProtocol && u.Port == 443) {
+		s += ":" + strconv.Itoa(u.Port)
 	}
 
-	if len(u.path) != 0 {
+	if len(u.Path) != 0 {
 		s += u.PathString()
 	}
 
-	if u.trailingSlash {
+	if u.TrailingSlash {
 		s += "/"
 	}
 
@@ -111,7 +112,7 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 
 	if len(protocolMatches) > 2 {
 		protocol := protocolMatches[1]
-		parsed.protocol = stringToProtocol(protocol)
+		parsed.Protocol = stringToProtocol(protocol)
 		s = protocolMatches[2] //remove the protocol to simplify future regex (this pattern repeats btw)
 	}
 
@@ -120,7 +121,7 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 
 	if len(subdomainMatches) > 2 {
 		subdomain := subdomainMatches[1]
-		parsed.subdomain = subdomain
+		parsed.Subdomain = subdomain
 		s = subdomainMatches[2] //see what i mean
 	}
 
@@ -129,7 +130,7 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 
 	if len(domainMatches) > 2 {
 		domain := domainMatches[1]
-		parsed.domain = domain
+		parsed.Domain = domain
 		s = domainMatches[2]
 	} else {
 		return parsed, fmt.Errorf("url: '%s' does not contain a domain", original_s)
@@ -140,7 +141,7 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 
 	if len(tldMatches) > 2 {
 		tld := tldMatches[1]
-		parsed.tld = tld
+		parsed.Tld = tld
 		s = tldMatches[2]
 	} else {
 		return parsed, fmt.Errorf("url: '%s' does not contain a tld", original_s)
@@ -154,7 +155,7 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 		if err != nil {
 			return parsed, fmt.Errorf("malformed port: '%s' is not a valid port. (%s)", portMatches[1], err.Error())
 		}
-		parsed.port = port
+		parsed.Port = port
 		s = portMatches[2]
 	}
 
@@ -163,13 +164,13 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 
 	if len(pathMatches) > 2 {
 		path := strings.Split(pathMatches[1], "/")
-		parsed.path = path
+		parsed.Path = path
 
 		s = pathMatches[2]
 	}
 
 	if s == "/" {
-		parsed.trailingSlash = true
+		parsed.TrailingSlash = true
 	}
 
 	return parsed, nil
@@ -193,15 +194,15 @@ func normalisePath(p []string) []string {
 }
 
 func normaliseUrl(u Url) Url {
-	u.path = normalisePath(u.path)
-	length := len(u.path)
+	u.Path = normalisePath(u.Path)
+	length := len(u.Path)
 	if length == 0 {
 		return u
 	}
 
-	if u.path[length-1] == "" {
-		u.path = u.path[:length-1]
-		u.trailingSlash = true
+	if u.Path[length-1] == "" {
+		u.Path = u.Path[:length-1]
+		u.TrailingSlash = true
 	}
 	return u
 }
@@ -209,7 +210,7 @@ func normaliseUrl(u Url) Url {
 func ParseRelativeUrl(s string, base Url) (Url, error) {
 	absUrl, err := ParseAbsoluteUrl(s)
 
-	if err == nil && absUrl.protocol != UnspecifiedProtocol {
+	if err == nil && absUrl.Protocol != UnspecifiedProtocol {
 		return absUrl, nil
 	}
 
@@ -222,10 +223,10 @@ func ParseRelativeUrl(s string, base Url) (Url, error) {
 
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
 		path := strings.Split(matches[0], "/")
-		base.path = normalisePath(append(base.path, path...))
+		base.Path = normalisePath(append(base.Path, path...))
 		return normaliseUrl(base), nil
 	} else if matches[1] == "/" {
-		base.path = strings.Split(matches[2], "/")
+		base.Path = strings.Split(matches[2], "/")
 		return normaliseUrl(base), nil
 	}
 

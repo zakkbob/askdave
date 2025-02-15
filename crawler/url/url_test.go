@@ -1,4 +1,4 @@
-package urls
+package url
 
 import (
 	"testing"
@@ -13,14 +13,14 @@ func TestUrlString(t *testing.T) {
 			}, true,
 		},
 		{
-			domain: "example",
-			tld:    "com",
+			Domain: "example",
+			Tld:    "com",
 		},
 		{
-			protocol: HttpProtocol,
-			domain:   "example",
-			tld:      "com",
-			port:     80,
+			Protocol: HttpProtocol,
+			Domain:   "example",
+			Tld:      "com",
+			Port:     80,
 		},
 	}
 	expectedUrls := []string{

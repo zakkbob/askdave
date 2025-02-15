@@ -1,16 +1,16 @@
-package main
+package page
 
 import (
-	"ZakkBob/AskDave/crawler/urls"
+	"ZakkBob/AskDave/crawler/url"
 	"fmt"
 	"os"
 	"testing"
 )
 
 func TestAddLink(t *testing.T) {
-	var p page
+	var p Page
 	expected := "https://google.com"
-	u, _ := urls.ParseAbsoluteUrl(expected)
+	u, _ := url.ParseAbsoluteUrl(expected)
 	p.addLink(u)
 	got := p.links[0].String()
 	if got != expected {
@@ -19,7 +19,7 @@ func TestAddLink(t *testing.T) {
 }
 
 func readPageFile(t *testing.T, n int) string {
-	content, err := os.ReadFile(fmt.Sprintf("testdata/pages/page_%d.html", n))
+	content, err := os.ReadFile(fmt.Sprintf("../testdata/pages/page_%d.html", n))
 	if err != nil {
 		t.Fatalf("Failed to read file: %v", err)
 	}
@@ -28,7 +28,7 @@ func readPageFile(t *testing.T, n int) string {
 
 func TestParseBody(t *testing.T) {
 	b := readPageFile(t, 1)
-	u, _ := urls.ParseAbsoluteUrl("https://www.example.com/home")
+	u, _ := url.ParseAbsoluteUrl("https://www.example.com/home")
 	p, err := parseBody(b, u)
 
 	if err != nil {

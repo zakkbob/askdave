@@ -1,41 +1,35 @@
-//------------------------------//
-// Processes page into a struct //
-//------------------------------//
+//-----------------------------------//
+// Processes a webpage into a struct //
+//-----------------------------------//
 
-package main
+package page
 
 import (
-	"ZakkBob/AskDave/crawler/urls"
+	"ZakkBob/AskDave/crawler/url"
 	"fmt"
 	"io"
 	"net/http"
 	"regexp"
-	"sync"
 )
 
-type page struct {
-	u             urls.Url
+type Page struct {
+	u             url.Url
 	pageTitle     string
 	ogTitle       string
 	ogDescription string
 	ogSiteName    string
-	links         []urls.Url
+	links         []url.Url
 }
 
-type safePageSlice struct {
-	mutex sync.Mutex
-	slice []page
-}
-
-func (p *page) addLink(u urls.Url) {
+func (p *Page) addLink(u url.Url) {
 	p.links = append(p.links, u)
 }
 
-func crawlPage(u urls.Url) (page, error) {
+func crawlPage(u url.Url) (Page, error) {
 	b, err := fetchPageBody(u)
 
 	if err != nil {
-		return page{u: u}, err
+		return Page{u: u}, err
 	}
 
 	p, err := parseBody(b, u)
@@ -44,8 +38,8 @@ func crawlPage(u urls.Url) (page, error) {
 	return p, err
 }
 
-func parseBody(b string, u urls.Url) (page, error) {
-	var p page
+func parseBody(b string, u url.Url) (Page, error) {
+	var p Page
 	p.ogTitle = extractBodyMeta(b, "title")
 	p.ogDescription = extractBodyMeta(b, "description")
 	p.ogSiteName = extractBodyMeta(b, "site_name")
@@ -57,7 +51,7 @@ func parseBody(b string, u urls.Url) (page, error) {
 	return p, nil
 }
 
-func fetchPageBody(u urls.Url) (string, error) {
+func fetchPageBody(u url.Url) (string, error) {
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return "", err
@@ -70,13 +64,13 @@ func fetchPageBody(u urls.Url) (string, error) {
 	return string(body), nil
 }
 
-func extractBodyMeta(page string, metaProperty string) (metaContent string) {
+func extractBodyMeta(Page string, metaProperty string) (metaContent string) {
 	metaElRegexString := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", metaProperty) //Temporary fix, won't work if content contains a '>'
 
 	metaElRegex := regexp.MustCompile(metaElRegexString)
 	metaContentRegex := regexp.MustCompile("(?s)content=\"(.*?)\"")
 
-	elMatches := metaElRegex.FindStringSubmatch(page)
+	elMatches := metaElRegex.FindStringSubmatch(Page)
 	if len(elMatches) < 1 {
 		return ""
 	}
@@ -104,13 +98,13 @@ func extractBodyTitle(page string) (pageTitle string) {
 	return pageTitle
 }
 
-func extractBodyLinks(body string, pageUrl urls.Url) (pageLinks []urls.Url) {
+func extractBodyLinks(body string, pageUrl url.Url) (pageLinks []url.Url) {
 	linkElRegex := regexp.MustCompile("(?s)<a.*?>") //Wont match if '>' is in the tag somewher :shruggie:
 	linkHrefRegex := regexp.MustCompile("(?s)href=\"(.*?)\"")
 
 	elMatches := linkElRegex.FindAllString(body, -1)
 	if len(elMatches) < 1 {
-		return []urls.Url{}
+		return []url.Url{}
 	}
 
 	for _, linkEl := range elMatches {
@@ -119,7 +113,7 @@ func extractBodyLinks(body string, pageUrl urls.Url) (pageLinks []urls.Url) {
 			continue
 		}
 
-		linkUrl, err := urls.ParseRelativeUrl(hrefMatches[1], pageUrl)
+		linkUrl, err := url.ParseRelativeUrl(hrefMatches[1], pageUrl)
 
 		if err != nil {
 			fmt.Println(err.Error())
