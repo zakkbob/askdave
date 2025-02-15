@@ -5,107 +5,66 @@
 package main
 
 import (
-// "fmt"
-// "io"
-// "net/http"
-// "regexp"
-// "slices"
-// "sync"
-// "time"
+	"fmt"
+	"time"
 )
 
 var crawledPages = safePageSlice{slice: make([]page, 0)}
-var crawlTasks = safeCrawlTaskSlice{slice: make([]crawlTask, 0)}
 
-// var start time.Time
+var robotsCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
+var sitemapCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
+var pageCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
 
-// func getAbsoluteUrl(url string, pageUrl string) (absoluteUrl string) { //Converts relative urls to fully qualified
-// 	if len(url) == 0 { //what the frick happened here
-// 		return url
-// 	}
+// var robotsCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
+// var sitemapCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
+// var pageCrawlTasks = safeUrlSlice{slice: make([]url, 0)}
 
-// 	if url[0] != '/' {
-// 		return url
-// 	}
+func completeNextTask() {
+	//Do robots crawl if present
+	robotsCrawlTasks.mu.Lock()
+	if len(robotsCrawlTasks.slice) > 0 {
+		u := robotsCrawlTasks.slice[0]
+		robotsCrawlTasks.slice = robotsCrawlTasks.slice[1:len(robotsCrawlTasks.slice)]
+		robotsCrawlTasks.mu.Unlock()
+		completeRobotsCrawl(u)
+		return
+	}
+	robotsCrawlTasks.mu.Unlock()
 
-// 	siteUrl := pageUrl
+	//Do sitemap crawl if present
+	sitemapCrawlTasks.mu.Lock()
+	if len(sitemapCrawlTasks.slice) > 0 {
+		u := sitemapCrawlTasks.slice[0]
+		sitemapCrawlTasks.slice = sitemapCrawlTasks.slice[1:len(sitemapCrawlTasks.slice)]
+		sitemapCrawlTasks.mu.Unlock()
+		completeSitemapCrawl(u)
+		return
+	}
+	sitemapCrawlTasks.mu.Unlock()
 
-// 	matched, _ := regexp.MatchString("(?i)https://.*?/.*", pageUrl)
+	//Do page crawl if present
+	pageCrawlTasks.mu.Lock()
+	if len(pageCrawlTasks.slice) > 0 {
+		u := pageCrawlTasks.slice[0]
+		pageCrawlTasks.slice = pageCrawlTasks.slice[1:len(pageCrawlTasks.slice)]
+		pageCrawlTasks.mu.Unlock()
+		completePageCrawl(u)
+		return
+	}
+	pageCrawlTasks.mu.Unlock()
+}
 
-// 	if matched { //if url pageUrl contains a directory
-// 		siteUrlRegex := regexp.MustCompile("(?i)(https://.*?)/")
-// 		matches := siteUrlRegex.FindStringSubmatch(pageUrl)
+func completeRobotsCrawl(u url) {
+	time.Sleep(1000 * time.Millisecond)
+	fmt.Printf("Crawled robots.txt '%s'\n", u.String())
+}
 
-// 		if len(matches) < 2 {
-// 			panic("what the freak!!")
-// 		}
+func completeSitemapCrawl(u url) {
+	time.Sleep(1000 * time.Millisecond)
+	fmt.Printf("Crawled sitemap '%s'\n", u.String())
+}
 
-// 		siteUrl = matches[1]
-// 	}
-// 	absoluteUrl = siteUrl + url
-
-// 	return absoluteUrl
-// }
-
-// func processDiscoveredUrl(url string) {
-// 	discoveredUrls.mutex.Lock()
-// 	if slices.Contains(discoveredUrls.slice, url) {
-// 		discoveredUrls.mutex.Unlock()
-// 		return
-// 	}
-// 	discoveredUrls.slice = append(discoveredUrls.slice, url)
-// 	discoveredUrls.mutex.Unlock()
-
-// 	uncrawledUrls.mutex.Lock()
-// 	uncrawledUrls.slice = append(uncrawledUrls.slice, url)
-// 	uncrawledUrls.mutex.Unlock()
-
-// }
-
-// func crawlNextUrl() {
-// 	uncrawledUrls.mutex.Lock()
-// 	uncrawledCount := len(uncrawledUrls.slice)
-// 	if len(uncrawledUrls.slice) == 0 {
-// 		uncrawledUrls.mutex.Unlock()
-// 		return
-// 	}
-
-// 	nextUrl := uncrawledUrls.slice[0]
-// 	uncrawledUrls.slice = slices.Delete(uncrawledUrls.slice, 0, 1)
-// 	uncrawledUrls.mutex.Unlock()
-
-// 	pageData := fetchPageData(nextUrl)
-
-// 	for _, url := range pageData.links {
-// 		processDiscoveredUrl(url)
-// 	}
-
-// 	crawledPages.mutex.Lock()
-// 	crawledPages.slice = append(crawledPages.slice, pageData)
-// 	crawledPages.mutex.Unlock()
-
-// 	crawledUrls.mutex.Lock()
-// 	crawledCount := len(crawledUrls.slice)
-// 	fmt.Printf("\r%f crawls/s %d Crawled, Uncrawled %d   ", float64(crawledCount)/time.Since(start).Seconds(), crawledCount, uncrawledCount)
-// 	crawledUrls.slice = append(crawledUrls.slice, nextUrl)
-// 	crawledUrls.mutex.Unlock()
-
-// }
-
-// func autoCrawl(count int) {
-// 	if count < 1 {
-// 		return
-// 	}
-// 	crawlNextUrl()
-// 	autoCrawl(count - 1)
-// }
-
-// func logCrawlStats() {
-// 	crawledUrls.mutex.Lock()
-// 	defer crawledUrls.mutex.Unlock()
-// 	//uncrawledUrls.mutex.Lock()
-// 	//defer uncrawledUrls.mutex.Unlock()
-
-// 	fmt.Println(len(crawledUrls.slice), "Crawled")
-// 	//fmt.Println(len(uncrawledUrls.slice), "Uncrawled")
-// }
+func completePageCrawl(u url) {
+	time.Sleep(1000 * time.Millisecond)
+	fmt.Printf("Crawled page '%s'\n", u.String())
+}

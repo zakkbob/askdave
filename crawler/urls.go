@@ -93,7 +93,7 @@ func parseAbsoluteUrl(s string) (url, error) {
 		s = protocolMatches[2] //remove the protocol to simplify future regex (this pattern repeats btw)
 	}
 
-	subdomainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.(.*?\\..*)")
+	subdomainRegex := regexp.MustCompile("^([a-z0-9-]+?)\\.([a-z0-9-]*?\\..*)")
 	subdomainMatches := subdomainRegex.FindStringSubmatch(s)
 
 	if len(subdomainMatches) > 2 {

@@ -46,6 +46,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 		"www.google.com/privacy-policy/help",
 		"google.com/privacy-policy/help",
 		"http://google.com/privacy-policy/",
+		"https://example.com/robots.txt",
 	}
 
 	for _, expected := range testStrings {

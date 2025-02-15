@@ -1,12 +1,41 @@
 package main
 
 import (
-// "fmt"
-// "sync"
-// "time"
+	"fmt"
+	"strconv"
+	"sync"
 )
 
 func main() {
+	for i := 0; i < 5; i++ {
+		s := "https://example.com/robots.txt" + strconv.Itoa(i)
+
+		u, _ := parseAbsoluteUrl(s)
+		robotsCrawlTasks.slice = append(robotsCrawlTasks.slice, u)
+	}
+
+	for i := 0; i < 5; i++ {
+		u, _ := parseAbsoluteUrl(fmt.Sprintf("https://example.com/sitemap%d.xml", i))
+		sitemapCrawlTasks.slice = append(sitemapCrawlTasks.slice, u)
+	}
+
+	for i := 0; i < 5; i++ {
+		u, _ := parseAbsoluteUrl(fmt.Sprintf("https://example.com/page%d.html", i))
+		pageCrawlTasks.slice = append(pageCrawlTasks.slice, u)
+	}
+
+	var wg sync.WaitGroup
+
+	for range 15 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			completeNextTask()
+		}()
+	}
+
+	wg.Wait()
+
 	// 	start = time.Now()
 
 	// 	var wg sync.WaitGroup
