@@ -5,66 +5,47 @@
 package page
 
 import (
+	"ZakkBob/AskDave/crawler/fetcher"
 	"ZakkBob/AskDave/crawler/url"
+	"crypto/md5"
 	"fmt"
-	"io"
-	"net/http"
 	"regexp"
 )
 
 type Page struct {
-	u             url.Url
-	pageTitle     string
-	ogTitle       string
-	ogDescription string
-	ogSiteName    string
-	links         []url.Url
+	Url           url.Url
+	Title         string
+	OgTitle       string
+	OgDescription string
+	OgSiteName    string
+	Links         []url.Url
+	Hash          [16]byte //Hash of page (for checking if it has changed)
 }
 
-func (p *Page) addLink(u url.Url) {
-	p.links = append(p.links, u)
+func (p *Page) AddLink(u url.Url) {
+	p.Links = append(p.Links, u)
 }
 
-func crawlPage(u url.Url) (Page, error) {
-	b, err := fetchPageBody(u)
+func CrawlUrl(url url.Url, fetcher fetcher.Fetcher) (Page, error) {
+	body, err := fetcher.Fetch(url)
 
 	if err != nil {
-		return Page{u: u}, err
+		return Page{}, err
 	}
 
-	p, err := parseBody(b, u)
-	p.u = u
-
+	var p = Page{
+		Url:           url,
+		Title:         extractTitle(body),
+		OgTitle:       extractMeta(body, "title"),
+		OgDescription: extractMeta(body, "description"),
+		OgSiteName:    extractMeta(body, "site_name"),
+		Links:         extractLinks(body, url),
+		Hash:          md5.Sum([]byte(body)),
+	}
 	return p, err
 }
 
-func parseBody(b string, u url.Url) (Page, error) {
-	var p Page
-	p.ogTitle = extractBodyMeta(b, "title")
-	p.ogDescription = extractBodyMeta(b, "description")
-	p.ogSiteName = extractBodyMeta(b, "site_name")
-
-	p.pageTitle = extractBodyTitle(b)
-
-	p.links = extractBodyLinks(b, u)
-
-	return p, nil
-}
-
-func fetchPageBody(u url.Url) (string, error) {
-	resp, err := http.Get(u.String())
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
-}
-
-func extractBodyMeta(Page string, metaProperty string) (metaContent string) {
+func extractMeta(Page string, metaProperty string) string {
 	metaElRegexString := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", metaProperty) //Temporary fix, won't work if content contains a '>'
 
 	metaElRegex := regexp.MustCompile(metaElRegexString)
@@ -82,11 +63,10 @@ func extractBodyMeta(Page string, metaProperty string) (metaContent string) {
 		return ""
 	}
 
-	metaContent = contentMatches[1]
-	return metaContent
+	return contentMatches[1]
 }
 
-func extractBodyTitle(page string) (pageTitle string) {
+func extractTitle(page string) (pageTitle string) {
 	pageTitleRegex := regexp.MustCompile("(?s)<title.*?>(.*?)</title>") //Temporary, won't match if space are in the tags :(
 	matches := pageTitleRegex.FindStringSubmatch(page)
 
@@ -98,7 +78,9 @@ func extractBodyTitle(page string) (pageTitle string) {
 	return pageTitle
 }
 
-func extractBodyLinks(body string, pageUrl url.Url) (pageLinks []url.Url) {
+func extractLinks(body string, pageUrl url.Url) []url.Url {
+	var pageLinks []url.Url
+
 	linkElRegex := regexp.MustCompile("(?s)<a.*?>") //Wont match if '>' is in the tag somewher :shruggie:
 	linkHrefRegex := regexp.MustCompile("(?s)href=\"(.*?)\"")
 

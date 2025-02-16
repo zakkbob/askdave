@@ -101,3 +101,80 @@ func TestParseRelativeUrl(t *testing.T) {
 		}
 	}
 }
+
+func TestIsFile(t *testing.T) {
+	testStrings := []string{
+		"example.com/subdir/home.php",
+		"example.com/home.html",
+		"example.com/subdir/home",
+		"http://example.org/examples",
+		"http://example.org",
+		"example.com/subdir-2",
+		"example.com",
+		"example.com/subdir/",
+	}
+
+	wantStrings := []bool{
+		true,
+		true,
+		false,
+		false,
+		false,
+		false,
+		false,
+		false,
+	}
+
+	for i, testString := range testStrings {
+		parsed, err := ParseAbsoluteUrl(testString)
+		if err != nil {
+			t.Error(err.Error())
+			continue
+		}
+		got := parsed.IsFile()
+		want := wantStrings[i]
+		if got != want {
+			t.Errorf("got '%t', expected '%t'", got, want)
+		}
+	}
+}
+
+func TestParseRelativeUrlWithFile(t *testing.T) {
+	baseUrl, _ := ParseAbsoluteUrl("example.com/subdir/index.html")
+
+	testStrings := []string{
+		"home.php",
+		"/home.html",
+		"./home",
+		"http://example.org/examples",
+		"http://example.org",
+		"../subdir-2",
+		"../../..",
+		"../../e/./../subdir/",
+	}
+
+	expectedStrings := []string{
+		"example.com/subdir/home.php",
+		"example.com/home.html",
+		"example.com/subdir/home",
+		"http://example.org/examples",
+		"http://example.org",
+		"example.com/subdir-2",
+		"example.com",
+		"example.com/subdir/",
+	}
+
+	for i, testString := range testStrings {
+		parsed, err := ParseRelativeUrl(testString, baseUrl)
+		if err != nil {
+			t.Error(err.Error())
+			continue
+		}
+		got := parsed.String()
+		expected := expectedStrings[i]
+		if got != expected {
+			t.Errorf("got '%s', expected '%s'", got, expected)
+			t.Error(parsed)
+		}
+	}
+}

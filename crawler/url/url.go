@@ -29,6 +29,15 @@ type Url struct {
 	TrailingSlash bool     //optional (default false)
 }
 
+func (u *Url) IsFile() bool {
+	fileRegex := regexp.MustCompile(`^.+\..+$`)
+	pathLen := len(u.Path)
+	if pathLen == 0 {
+		return false
+	}
+	return fileRegex.MatchString(u.Path[pathLen-1])
+}
+
 var protocolStringMap = map[Protocol]string{
 	UnspecifiedProtocol: "",
 	HttpProtocol:        "http",
@@ -165,7 +174,6 @@ func ParseAbsoluteUrl(s string) (Url, error) {
 	if len(pathMatches) > 2 {
 		path := strings.Split(pathMatches[1], "/")
 		parsed.Path = path
-
 		s = pathMatches[2]
 	}
 
@@ -223,6 +231,9 @@ func ParseRelativeUrl(s string, base Url) (Url, error) {
 
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
 		path := strings.Split(matches[0], "/")
+		if base.IsFile() {
+			base.Path = base.Path[:len(base.Path)-1]
+		}
 		base.Path = normalisePath(append(base.Path, path...))
 		return normaliseUrl(base), nil
 	} else if matches[1] == "/" {

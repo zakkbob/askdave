@@ -1,39 +1,44 @@
-package page
+package page_test
 
 import (
+	"ZakkBob/AskDave/crawler/fetcher"
+	"ZakkBob/AskDave/crawler/page"
 	"ZakkBob/AskDave/crawler/url"
-	"fmt"
-	"os"
 	"testing"
 )
 
 func TestAddLink(t *testing.T) {
-	var p Page
+	var p page.Page
 	expected := "https://google.com"
 	u, _ := url.ParseAbsoluteUrl(expected)
-	p.addLink(u)
-	got := p.links[0].String()
+	p.AddLink(u)
+	got := p.Links[0].String()
 	if got != expected {
 		t.Errorf("got '%s', expected '%s'", got, expected)
 	}
 }
 
-func readPageFile(t *testing.T, n int) string {
-	content, err := os.ReadFile(fmt.Sprintf("../testdata/pages/page_%d.html", n))
-	if err != nil {
-		t.Fatalf("Failed to read file: %v", err)
-	}
-	return string(content)
-}
-
 func TestParseBody(t *testing.T) {
-	b := readPageFile(t, 1)
-	u, _ := url.ParseAbsoluteUrl("https://www.example.com/home")
-	p, err := parseBody(b, u)
+	fetcher := &fetcher.FileFetcher{}
+	u, _ := url.ParseAbsoluteUrl("https://pagetest.com/index.html")
+	p, _ := page.CrawlUrl(u, fetcher)
 
-	if err != nil {
-		t.Fatal(err.Error())
+	link1, _ := url.ParseAbsoluteUrl("https://pagetest.com/example.com")
+	link2, _ := url.ParseAbsoluteUrl("https://pagetest.com/lol")
+
+	var hash [16]byte
+	copy(hash[:], "2D4659D54B58FD8AB0367C5734AF9632")
+
+	expectedPage := page.Page{
+		Url:           u,
+		Title:         "Example Page",
+		OgTitle:       "og title",
+		OgDescription: "og description",
+		OgSiteName:    "og sitename",
+		Links:         []url.Url{link1, link2},
+		Hash:          hash,
 	}
 
+	t.Log(expectedPage)
 	t.Log(p)
 }
