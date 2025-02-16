@@ -5,6 +5,7 @@
 package url
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -27,6 +28,21 @@ type Url struct {
 	Port          int      //optional (default based on protocol)
 	Path          []string //optional (default empty)
 	TrailingSlash bool     //optional (default false)
+}
+
+func (u *Url) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.String())
+}
+
+func (u *Url) UnmarshalJSON(data []byte) error {
+	var s string
+	json.Unmarshal(data, &s)
+	newU, err := ParseAbs(s)
+	if err != nil {
+		return err
+	}
+	*u = newU
+	return err
 }
 
 func (u *Url) IsFile() bool {
