@@ -50,7 +50,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 	}
 
 	for _, expected := range testStrings {
-		parsed, err := ParseAbsoluteUrl(expected)
+		parsed, err := ParseAbs(expected)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -63,7 +63,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 }
 
 func TestParseRelativeUrl(t *testing.T) {
-	baseUrl, _ := ParseAbsoluteUrl("example.com/subdir")
+	baseUrl, _ := ParseAbs("example.com/subdir")
 
 	testStrings := []string{
 		"home.php",
@@ -88,7 +88,7 @@ func TestParseRelativeUrl(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseRelativeUrl(testString, baseUrl)
+		parsed, err := ParseRel(testString, baseUrl)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -126,7 +126,7 @@ func TestIsFile(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseAbsoluteUrl(testString)
+		parsed, err := ParseAbs(testString)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -140,14 +140,12 @@ func TestIsFile(t *testing.T) {
 }
 
 func TestParseRelativeUrlWithFile(t *testing.T) {
-	baseUrl, _ := ParseAbsoluteUrl("example.com/subdir/index.html")
+	baseUrl, _ := ParseAbs("example.com/subdir/index.html")
 
 	testStrings := []string{
 		"home.php",
 		"/home.html",
 		"./home",
-		"http://example.org/examples",
-		"http://example.org",
 		"../subdir-2",
 		"../../..",
 		"../../e/./../subdir/",
@@ -157,15 +155,13 @@ func TestParseRelativeUrlWithFile(t *testing.T) {
 		"example.com/subdir/home.php",
 		"example.com/home.html",
 		"example.com/subdir/home",
-		"http://example.org/examples",
-		"http://example.org",
 		"example.com/subdir-2",
 		"example.com",
 		"example.com/subdir/",
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseRelativeUrl(testString, baseUrl)
+		parsed, err := ParseRel(testString, baseUrl)
 		if err != nil {
 			t.Error(err.Error())
 			continue

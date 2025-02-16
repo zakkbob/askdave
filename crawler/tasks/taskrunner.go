@@ -5,24 +5,54 @@
 package tasks
 
 import (
-	"ZakkBob/AskDave/crawler/url"
-	"fmt"
-	"math/rand"
+	"ZakkBob/AskDave/crawler/fetcher"
 	"sync"
-	"time"
 )
 
 type TaskRunner struct {
 	Tasks   Tasks
 	Results Results
+	Fetcher fetcher.Fetcher
 }
 
 func (r *TaskRunner) Run(concurrency int) {
-	loopConcurrently(r.completeNextRobotsTask, concurrency)
-	loopConcurrently(r.completeNextSitemapTask, concurrency)
-	loopConcurrently(r.completeNextPageTask, concurrency)
+	loopConcurrently(r.crawlNextRobots, concurrency)
+	loopConcurrently(r.crawlNextSitemap, concurrency)
+	loopConcurrently(r.crawlNextPage, concurrency)
 }
 
+// Attempts to crawl the next robots.txt in the taskList, returns false if no more
+func (r *TaskRunner) crawlNextRobots() bool {
+	u := r.Tasks.Robots.Next()
+	if u == nil {
+		return false
+	}
+	r.Fetcher.Fetch(u)
+
+	return true
+}
+
+// Attempts to crawl the next sitemap in the taskList, returns false if no more
+func (r *TaskRunner) crawlNextSitemap() bool {
+	u := r.Tasks.Sitemaps.Next()
+	if u == nil {
+		return false
+	}
+	r.Fetcher.Fetch(u)
+	return true
+}
+
+// Attempts to crawl the next page in the taskList, returns false if no more
+func (r *TaskRunner) crawlNextPage() bool {
+	u := r.Tasks.Pages.Next()
+	if u == nil {
+		return false
+	}
+	r.Fetcher.Fetch(u)
+	return true
+}
+
+// Runs n goroutines, each calling t until it return false
 func loopConcurrently(t func() bool, workers int) {
 	var wg sync.WaitGroup
 
@@ -36,58 +66,4 @@ func loopConcurrently(t func() bool, workers int) {
 	}
 
 	wg.Wait()
-}
-
-func (runner *TaskRunner) completeNextRobotsTask() bool {
-	runner.Tasks.RobotsMu.Lock()
-	if len(runner.Tasks.Robots) > 0 {
-		u := runner.Tasks.Robots[0]
-		runner.Tasks.Robots = runner.Tasks.Robots[1:len(runner.Tasks.Robots)]
-		runner.Tasks.RobotsMu.Unlock()
-		completeRobotsCrawl(u)
-		return true
-	}
-	runner.Tasks.RobotsMu.Unlock()
-	return false
-}
-
-func (r *TaskRunner) completeNextSitemapTask() bool {
-	r.Tasks.SitemapsMu.Lock()
-	if len(r.Tasks.Sitemaps) > 0 {
-		u := r.Tasks.Sitemaps[0]
-		r.Tasks.Sitemaps = r.Tasks.Sitemaps[1:len(r.Tasks.Sitemaps)]
-		r.Tasks.SitemapsMu.Unlock()
-		completeSitemapCrawl(u)
-		return true
-	}
-	r.Tasks.SitemapsMu.Unlock()
-	return false
-}
-
-func (r *TaskRunner) completeNextPageTask() bool {
-	r.Tasks.PagesMu.Lock()
-	if len(r.Tasks.Pages) > 0 {
-		u := r.Tasks.Pages[0]
-		r.Tasks.Pages = r.Tasks.Pages[1:len(r.Tasks.Pages)]
-		r.Tasks.PagesMu.Unlock()
-		completePageCrawl(u)
-		return true
-	}
-	r.Tasks.PagesMu.Unlock()
-	return false
-}
-
-func completeRobotsCrawl(u url.Url) {
-	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
-	fmt.Printf("Crawled robots.txt '%s'\n", u.String())
-}
-
-func completeSitemapCrawl(u url.Url) {
-	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
-	fmt.Printf("Crawled sitemap '%s'\n", u.String())
-}
-
-func completePageCrawl(u url.Url) {
-	time.Sleep(time.Duration(1000+rand.Int()%1000) * time.Millisecond)
-	fmt.Printf("Crawled page '%s'\n", u.String())
 }

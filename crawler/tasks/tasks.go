@@ -6,10 +6,24 @@ import (
 )
 
 type Tasks struct {
-	Robots     []url.Url
-	RobotsMu   sync.Mutex //Should be able to remove this eventually (bit clunky)
-	Sitemaps   []url.Url
-	SitemapsMu sync.Mutex
-	Pages      []url.Url
-	PagesMu    sync.Mutex
+	Robots   taskSlice // Bit clunky
+	Sitemaps taskSlice
+	Pages    taskSlice
+}
+
+type taskSlice struct {
+	Mu    sync.Mutex
+	Slice []url.Url
+}
+
+// Returns next url in slice, returns nil if slice is empty
+func (t *taskSlice) Next() *url.Url {
+	t.Mu.Lock()
+	defer t.Mu.Unlock()
+	if len(t.Slice) == 0 {
+		return nil
+	}
+	u := &t.Slice[0]
+	t.Slice = t.Slice[1:len(t.Slice)]
+	return u
 }

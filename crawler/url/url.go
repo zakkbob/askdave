@@ -112,7 +112,7 @@ func (u *Url) String() string {
 	return s
 }
 
-func ParseAbsoluteUrl(s string) (Url, error) {
+func ParseAbs(s string) (Url, error) {
 	original_s := s
 	var parsed Url
 
@@ -201,7 +201,7 @@ func normalisePath(p []string) []string {
 	return n
 }
 
-func normaliseUrl(u Url) Url {
+func normalise(u Url) Url {
 	u.Path = normalisePath(u.Path)
 	length := len(u.Path)
 	if length == 0 {
@@ -215,8 +215,8 @@ func normaliseUrl(u Url) Url {
 	return u
 }
 
-func ParseRelativeUrl(s string, base Url) (Url, error) {
-	absUrl, err := ParseAbsoluteUrl(s)
+func ParseRel(s string, base Url) (Url, error) {
+	absUrl, err := ParseAbs(s)
 
 	if err == nil && absUrl.Protocol != UnspecifiedProtocol {
 		return absUrl, nil
@@ -235,10 +235,10 @@ func ParseRelativeUrl(s string, base Url) (Url, error) {
 			base.Path = base.Path[:len(base.Path)-1]
 		}
 		base.Path = normalisePath(append(base.Path, path...))
-		return normaliseUrl(base), nil
+		return normalise(base), nil
 	} else if matches[1] == "/" {
 		base.Path = strings.Split(matches[2], "/")
-		return normaliseUrl(base), nil
+		return normalise(base), nil
 	}
 
 	if err != nil {

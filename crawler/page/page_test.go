@@ -10,7 +10,7 @@ import (
 func TestAddLink(t *testing.T) {
 	var p page.Page
 	expected := "https://google.com"
-	u, _ := url.ParseAbsoluteUrl(expected)
+	u, _ := url.ParseAbs(expected)
 	p.AddLink(u)
 	got := p.Links[0].String()
 	if got != expected {
@@ -20,14 +20,13 @@ func TestAddLink(t *testing.T) {
 
 func TestParseBody(t *testing.T) {
 	fetcher := &fetcher.FileFetcher{}
-	u, _ := url.ParseAbsoluteUrl("https://pagetest.com/index.html")
+	u, _ := url.ParseAbs("https://pagetest.com/index.html")
 	p, _ := page.CrawlUrl(u, fetcher)
 
-	link1, _ := url.ParseAbsoluteUrl("https://pagetest.com/example.com")
-	link2, _ := url.ParseAbsoluteUrl("https://pagetest.com/lol")
+	link1, _ := url.ParseAbs("https://pagetest.com/example.com")
+	link2, _ := url.ParseAbs("https://pagetest.com/lol")
 
-	var hash [16]byte
-	copy(hash[:], "2D4659D54B58FD8AB0367C5734AF9632")
+	expectedHash := [16]byte{45, 70, 89, 213, 75, 88, 253, 138, 176, 54, 124, 87, 52, 175, 150, 50}
 
 	expectedPage := page.Page{
 		Url:           u,
@@ -36,9 +35,32 @@ func TestParseBody(t *testing.T) {
 		OgDescription: "og description",
 		OgSiteName:    "og sitename",
 		Links:         []url.Url{link1, link2},
-		Hash:          hash,
+		Hash:          expectedHash,
 	}
 
-	t.Log(expectedPage)
-	t.Log(p)
+	if expectedPage.Url.String() != p.Url.String() {
+		t.Errorf("got url '%s', expected '%s'", expectedPage.Url.String(), p.Url.String())
+	}
+	if expectedPage.Title != p.Title {
+		t.Errorf("got title '%s', expected '%s'", expectedPage.Title, p.Title)
+	}
+	if expectedPage.OgTitle != p.OgTitle {
+		t.Errorf("got ogTitle '%s', expected '%s'", expectedPage.OgTitle, p.OgTitle)
+	}
+	if expectedPage.OgDescription != p.OgDescription {
+		t.Errorf("got ogDescription '%s', expected '%s'", expectedPage.OgDescription, p.OgDescription)
+	}
+	if expectedPage.OgSiteName != p.OgSiteName {
+		t.Errorf("got ogSiteName '%s', expected '%s'", expectedPage.OgSiteName, p.OgSiteName)
+	}
+	for i, got := range p.Links {
+		want := expectedPage.Links[i]
+		if got.String() != want.String() {
+			t.Errorf("got links '%+v', expected '%v'", expectedPage.Links, p.Links)
+			break
+		}
+	}
+	if expectedPage.Hash != p.Hash {
+		t.Errorf("got url '%s', expected '%s'", expectedPage.Hash, p.Hash)
+	}
 }

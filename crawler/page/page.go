@@ -27,7 +27,7 @@ func (p *Page) AddLink(u url.Url) {
 }
 
 func CrawlUrl(url url.Url, fetcher fetcher.Fetcher) (Page, error) {
-	body, err := fetcher.Fetch(url)
+	body, err := fetcher.Fetch(&url)
 
 	if err != nil {
 		return Page{}, err
@@ -95,7 +95,7 @@ func extractLinks(body string, pageUrl url.Url) []url.Url {
 			continue
 		}
 
-		linkUrl, err := url.ParseRelativeUrl(hrefMatches[1], pageUrl)
+		linkUrl, err := url.ParseRel(hrefMatches[1], pageUrl)
 
 		if err != nil {
 			fmt.Println(err.Error())

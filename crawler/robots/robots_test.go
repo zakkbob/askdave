@@ -32,7 +32,7 @@ func TestExtractDavebotDirectives(t *testing.T) {
 func TestUrlValidator(t *testing.T) {
 	robotsTxt := readRobotsTxt(t, "robots.txt")
 
-	validator, _ := ProcessRobotsTxt(robotsTxt)
+	validator, _ := Parse(robotsTxt)
 
 	testUrls := map[string]bool{
 		"/allowed-dir":                              true,

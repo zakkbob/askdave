@@ -146,7 +146,7 @@ func generateUrlValidator(directives string) UrlValidator {
 	return validator
 }
 
-func ProcessRobotsTxt(content string) (validator UrlValidator, sitemapUrl string) {
+func Parse(content string) (validator UrlValidator, sitemapUrl string) {
 	content = removeComments(content)
 	blocks := extractUserAgentBlocks(content)
 	directives := extractDavebotDirectives(blocks)
