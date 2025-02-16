@@ -2,6 +2,7 @@ package url_test
 
 import (
 	"ZakkBob/AskDave/crawler/url"
+	"encoding/json"
 	"testing"
 )
 
@@ -173,5 +174,28 @@ func TestParseRelativeUrlWithFile(t *testing.T) {
 			t.Errorf("got '%s', expected '%s'", got, expected)
 			t.Error(parsed)
 		}
+	}
+}
+
+func TestMarshal(t *testing.T) {
+	u, _ := url.ParseAbs("https://www.example.com/e")
+	got, _ := json.MarshalIndent(&u, "", "  ")
+	want := `"https://www.example.com/e"`
+
+	if string(got) != want {
+		t.Errorf("expected '%s', but got '%s'", want, string(got))
+	}
+}
+
+func TestUnmarshal(t *testing.T) {
+	data := []byte(`"https://www.example.com/e"`)
+	var u url.Url
+
+	json.Unmarshal(data, &u)
+
+	want := "https://www.example.com/e"
+
+	if u.String() != want {
+		t.Errorf("expected '%s', but got '%s'", want, u.String())
 	}
 }

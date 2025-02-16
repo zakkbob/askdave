@@ -27,9 +27,9 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
+	data := []byte(`"9d770c909c2c69b09eae2372c4cf405d"`)
 	var h hash.Hash
-	bytes := []byte(`"9d770c909c2c69b09eae2372c4cf405d"`)
-	json.Unmarshal(bytes, &h)
+	json.Unmarshal(data, &h)
 
 	want := "9d770c909c2c69b09eae2372c4cf405d"
 
