@@ -2,10 +2,8 @@ package main
 
 import (
 	"ZakkBob/AskDave/crawler/fetcher"
-	"ZakkBob/AskDave/crawler/hash"
 	"ZakkBob/AskDave/crawler/tasks"
 	"ZakkBob/AskDave/crawler/url"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -38,16 +36,5 @@ func main() {
 		r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
 	}
 
-	// r.Run(50)
-
-	j, _ := json.MarshalIndent(&r, "", "  ")
-	fmt.Println(string(j))
-
-	h := hash.Hashs("e")
-	j, _ = json.MarshalIndent(&h, "", "  ")
-	fmt.Println(string(j))
-
-	var d hash.Hash
-	json.Unmarshal(j, &d)
-	fmt.Println(d.String())
+	r.Run(50)
 }

@@ -15,22 +15,22 @@ const (
 )
 
 type Results struct {
-	Robots   map[string]RobotsResult
-	Sitemaps map[string]string
-	Pages    map[string]PageResult
+	Robots   map[string]RobotsResult `json:"robots"`
+	Sitemaps map[string]string       `json:"sitemaps"`
+	Pages    map[string]PageResult   `json:"pages"`
 }
 
 type PageResult struct {
-	Url           url.Url
-	Success       bool
-	FailureReason FailureReason
-	Changed       bool
-	Page          page.Page
+	Url           url.Url       `json:"url"`
+	Success       bool          `json:"success"`
+	FailureReason FailureReason `json:"failure_reason,omitempty"`
+	Changed       bool          `json:"changed"`
+	Page          page.Page     `json:"page"`
 }
 
 type RobotsResult struct {
-	Url       url.Url
-	Hash      hash.Hash
-	Changed   bool
-	Validator robots.UrlValidator
+	Url       url.Url             `json:"robots"`
+	Hash      hash.Hash           `json:"hash"`
+	Changed   bool                `json:"changed"`
+	Validator robots.UrlValidator `json:"validator"`
 }

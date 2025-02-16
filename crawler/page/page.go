@@ -12,13 +12,13 @@ import (
 )
 
 type Page struct {
-	Url           url.Url
-	Title         string
-	OgTitle       string
-	OgDescription string
-	OgSiteName    string
-	Links         []url.Url
-	Hash          hash.Hash
+	Url           url.Url   `json:"url"`
+	Title         string    `json:"title"`
+	OgTitle       string    `json:"og_title"`
+	OgDescription string    `json:"og_description"`
+	OgSiteName    string    `json:"og_site_name"`
+	Links         []url.Url `json:"links"`
+	Hash          hash.Hash `json:"hash"`
 }
 
 func (p *Page) AddLink(u url.Url) {

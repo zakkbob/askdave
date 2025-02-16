@@ -12,14 +12,14 @@ import (
 )
 
 type UrlValidator struct {
-	allowedPatterns    []*regexp.Regexp
-	disallowedPatterns []*regexp.Regexp
+	AllowedPatterns    []*regexp.Regexp `json:"allowed_patterns"`
+	DisallowedPatterns []*regexp.Regexp `json:"disallowed_patterns"`
 }
 
 func (validator *UrlValidator) Validate(url string) bool {
 	longestMatch := 0
 	isValid := true
-	for _, pattern := range validator.allowedPatterns {
+	for _, pattern := range validator.AllowedPatterns {
 		indices := pattern.FindStringIndex(url)
 		if indices == nil {
 			continue
@@ -30,7 +30,7 @@ func (validator *UrlValidator) Validate(url string) bool {
 			isValid = true
 		}
 	}
-	for _, pattern := range validator.disallowedPatterns {
+	for _, pattern := range validator.DisallowedPatterns {
 		indices := pattern.FindStringIndex(url)
 		if indices == nil {
 			continue
@@ -137,9 +137,9 @@ func generateUrlValidator(directives string) UrlValidator {
 
 		switch name {
 		case "disallow":
-			validator.disallowedPatterns = append(validator.disallowedPatterns, regex)
+			validator.DisallowedPatterns = append(validator.DisallowedPatterns, regex)
 		case "allow":
-			validator.allowedPatterns = append(validator.allowedPatterns, regex)
+			validator.AllowedPatterns = append(validator.AllowedPatterns, regex)
 		}
 	}
 

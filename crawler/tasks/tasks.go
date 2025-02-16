@@ -6,14 +6,14 @@ import (
 )
 
 type Tasks struct {
-	Robots   taskSlice // Bit clunky
-	Sitemaps taskSlice
-	Pages    taskSlice
+	Robots   taskSlice `json:"robots"` // Bit clunky
+	Sitemaps taskSlice `json:"sitemaps"`
+	Pages    taskSlice `json:"pages"`
 }
 
 type taskSlice struct {
-	Mu    sync.Mutex
-	Slice []url.Url
+	Mu    sync.Mutex `json:"-"`
+	Slice []url.Url  `json:"slice"`
 }
 
 // Returns next url in slice, returns nil if slice is empty
