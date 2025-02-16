@@ -76,6 +76,7 @@ func TestParseRelativeUrl(t *testing.T) {
 		"../subdir-2",
 		"../../..",
 		"../../e/./../subdir/",
+		"/",
 	}
 
 	expectedStrings := []string{
@@ -87,6 +88,7 @@ func TestParseRelativeUrl(t *testing.T) {
 		"example.com/subdir-2",
 		"example.com",
 		"example.com/subdir/",
+		"example.com",
 	}
 
 	for i, testString := range testStrings {

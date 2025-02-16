@@ -7,6 +7,7 @@ package tasks
 import (
 	"ZakkBob/AskDave/crawler/fetcher"
 	"ZakkBob/AskDave/crawler/hash"
+	"ZakkBob/AskDave/crawler/page"
 	"ZakkBob/AskDave/crawler/robots"
 	"sync"
 )
@@ -75,10 +76,21 @@ func (r *TaskRunner) crawlNextPage() (bool, error) {
 	if u == nil {
 		return false, nil
 	}
-	_, err := r.Fetcher.Fetch(u)
+	b, err := r.Fetcher.Fetch(u)
 	if err != nil {
 		return true, err
 	}
+
+	p := page.Parse(b, *u)
+	pageResult := PageResult{
+		Url:     u,
+		Success: true,
+		Changed: true,
+		Page:    &p,
+	}
+
+	r.Results.PagesChan <- &pageResult
+
 	return true, nil
 }
 

@@ -132,6 +132,8 @@ func ParseAbs(s string) (Url, error) {
 	original_s := s
 	var parsed Url
 
+	s = removeQuery(s)
+
 	protocolRegex := regexp.MustCompile(`^(https?):\/\/(.*)`)
 	protocolMatches := protocolRegex.FindStringSubmatch(s)
 
@@ -184,7 +186,7 @@ func ParseAbs(s string) (Url, error) {
 		s = portMatches[2]
 	}
 
-	pathRegex := regexp.MustCompile(`^\/(.+?)(\/)?$`)
+	pathRegex := regexp.MustCompile(`^\/(.+?)(\/)?$`) //maybe switch to `^\/(.+?)(\/)?(\?.*)?$` so query strings are ignored
 	pathMatches := pathRegex.FindStringSubmatch(s)
 
 	if len(pathMatches) > 2 {
@@ -231,6 +233,11 @@ func normalise(u Url) Url {
 	return u
 }
 
+func removeQuery(s string) string {
+	querySplit := strings.Split(s, "?")
+	return querySplit[0]
+}
+
 func ParseRel(s string, base Url) (Url, error) {
 	absUrl, err := ParseAbs(s)
 
@@ -238,8 +245,15 @@ func ParseRel(s string, base Url) (Url, error) {
 		return absUrl, nil
 	}
 
-	regex := regexp.MustCompile(`(\.?\.?\/)?(.+)`)
-	matches := regex.FindStringSubmatch(s)
+	s = removeQuery(s)
+
+	if s == "/" {
+		base.Path = []string{}
+		return base, nil
+	}
+
+	relPathRegex := regexp.MustCompile(`(\.?\.?\/)?(.+)`)
+	matches := relPathRegex.FindStringSubmatch(s)
 
 	if len(matches) < 3 {
 		return Url{}, fmt.Errorf("invalid relative url: %s", s)
@@ -247,6 +261,7 @@ func ParseRel(s string, base Url) (Url, error) {
 
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
 		path := strings.Split(matches[0], "/")
+
 		if base.IsFile() {
 			base.Path = base.Path[:len(base.Path)-1]
 		}

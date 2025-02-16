@@ -6,13 +6,16 @@ package fetcher
 
 import (
 	"ZakkBob/AskDave/crawler/url"
+	"embed"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 )
+
+//go:embed testsites/*
+var files embed.FS
 
 type Fetcher interface {
 	Fetch(*url.Url) (string, error)
@@ -71,12 +74,9 @@ type FileFetcher struct {
 }
 
 func (f *FileFetcher) Fetch(u *url.Url) (string, error) {
-	path := "../testdata/sites/"
-	if u.ProtocolString() != "" {
-		path += u.ProtocolString() + "/"
-	}
+	path := "testsites/"
 	path += u.FQDN() + u.PathString()
-	content, err := os.ReadFile(path)
+	content, err := files.ReadFile(path)
 	if f.Debug {
 		fmt.Printf("fetching file url '%s'\n", u.String())
 		fmt.Printf("path: '%s'\n", path)
