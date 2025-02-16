@@ -6,6 +6,8 @@ package tasks
 
 import (
 	"ZakkBob/AskDave/crawler/fetcher"
+	"ZakkBob/AskDave/crawler/hash"
+	"ZakkBob/AskDave/crawler/robots"
 	"sync"
 )
 
@@ -16,51 +18,86 @@ type TaskRunner struct {
 }
 
 func (r *TaskRunner) Run(concurrency int) {
+	go r.Results.ListenToChans()
+
 	loopConcurrently(r.crawlNextRobots, concurrency)
+	close(r.Results.RobotsChan)
+
 	loopConcurrently(r.crawlNextSitemap, concurrency)
+	close(r.Results.SitemapsChan)
+
 	loopConcurrently(r.crawlNextPage, concurrency)
+	close(r.Results.PagesChan)
+
+	<-r.Results.Finished
 }
 
 // Attempts to crawl the next robots.txt in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextRobots() bool {
+func (r *TaskRunner) crawlNextRobots() (bool, error) {
 	u := r.Tasks.Robots.Next()
 	if u == nil {
-		return false
+		return false, nil
 	}
-	r.Fetcher.Fetch(u)
+	b, err := r.Fetcher.Fetch(u)
+	if err != nil {
+		return true, err
+	}
 
-	return true
+	validator, _ := robots.Parse(b)
+	robotsResult := RobotsResult{
+		Url:       u,
+		Changed:   true,
+		Hash:      hash.Hashs(b),
+		Validator: &validator,
+	}
+
+	r.Results.RobotsChan <- &robotsResult
+
+	return true, nil
 }
 
 // Attempts to crawl the next sitemap in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextSitemap() bool {
+func (r *TaskRunner) crawlNextSitemap() (bool, error) {
 	u := r.Tasks.Sitemaps.Next()
 	if u == nil {
-		return false
+		return false, nil
 	}
-	r.Fetcher.Fetch(u)
-	return true
+	_, err := r.Fetcher.Fetch(u)
+	if err != nil {
+		return true, err
+	}
+	return true, nil
 }
 
 // Attempts to crawl the next page in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextPage() bool {
+func (r *TaskRunner) crawlNextPage() (bool, error) {
 	u := r.Tasks.Pages.Next()
 	if u == nil {
-		return false
+		return false, nil
 	}
-	r.Fetcher.Fetch(u)
-	return true
+	_, err := r.Fetcher.Fetch(u)
+	if err != nil {
+		return true, err
+	}
+	return true, nil
 }
 
 // Runs n goroutines, each calling t until it return false
-func loopConcurrently(t func() bool, workers int) {
+func loopConcurrently(t func() (bool, error), workers int) {
 	var wg sync.WaitGroup
 
 	for range workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for t() {
+			for {
+				isNext, err := t()
+				if err != nil {
+					panic(err.Error())
+				}
+				if !isNext {
+					break
+				}
 			}
 		}()
 	}

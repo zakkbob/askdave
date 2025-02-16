@@ -4,7 +4,6 @@ import (
 	"ZakkBob/AskDave/crawler/fetcher"
 	"ZakkBob/AskDave/crawler/tasks"
 	"ZakkBob/AskDave/crawler/url"
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -26,15 +25,15 @@ func main() {
 		r.Tasks.Robots.Slice = append(r.Tasks.Robots.Slice, u)
 	}
 
-	for i := 0; i < 2; i++ {
-		u, _ := url.ParseAbs(fmt.Sprintf("https://example.com/sitemap%d.xml", i))
-		r.Tasks.Sitemaps.Slice = append(r.Tasks.Sitemaps.Slice, u)
-	}
+	// for i := 0; i < 2; i++ {
+	// 	u, _ := url.ParseAbs(fmt.Sprintf("https://example.com/sitemap%d.xml", i))
+	// 	r.Tasks.Sitemaps.Slice = append(r.Tasks.Sitemaps.Slice, u)
+	// }
 
-	for i := 0; i < 2; i++ {
-		u, _ := url.ParseAbs(fmt.Sprintf("https://example.com/page%d.html", i))
-		r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
-	}
+	// for i := 0; i < 2; i++ {
+	// 	u, _ := url.ParseAbs(fmt.Sprintf("https://example.com/page%d.html", i))
+	// 	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
+	// }
 
 	r.Run(50)
 }
