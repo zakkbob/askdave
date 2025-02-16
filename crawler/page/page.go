@@ -5,9 +5,8 @@
 package page
 
 import (
-	"ZakkBob/AskDave/crawler/fetcher"
+	"ZakkBob/AskDave/crawler/hash"
 	"ZakkBob/AskDave/crawler/url"
-	"crypto/md5"
 	"fmt"
 	"regexp"
 )
@@ -19,30 +18,25 @@ type Page struct {
 	OgDescription string
 	OgSiteName    string
 	Links         []url.Url
-	Hash          [16]byte //Hash of page (for checking if it has changed)
+	Hash          hash.Hash
 }
 
 func (p *Page) AddLink(u url.Url) {
 	p.Links = append(p.Links, u)
 }
 
-func CrawlUrl(url url.Url, fetcher fetcher.Fetcher) (Page, error) {
-	body, err := fetcher.Fetch(&url)
-
-	if err != nil {
-		return Page{}, err
-	}
-
+// Parses webpage body (string) into a page struct
+func Parse(body string, u url.Url) Page {
 	var p = Page{
-		Url:           url,
+		Url:           u,
 		Title:         extractTitle(body),
 		OgTitle:       extractMeta(body, "title"),
 		OgDescription: extractMeta(body, "description"),
 		OgSiteName:    extractMeta(body, "site_name"),
-		Links:         extractLinks(body, url),
-		Hash:          md5.Sum([]byte(body)),
+		Links:         extractLinks(body, u),
+		Hash:          hash.Hashs(body),
 	}
-	return p, err
+	return p
 }
 
 func extractMeta(Page string, metaProperty string) string {

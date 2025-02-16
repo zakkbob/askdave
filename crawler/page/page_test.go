@@ -21,7 +21,8 @@ func TestAddLink(t *testing.T) {
 func TestParseBody(t *testing.T) {
 	fetcher := &fetcher.FileFetcher{}
 	u, _ := url.ParseAbs("https://pagetest.com/index.html")
-	p, _ := page.CrawlUrl(u, fetcher)
+	b, _ := fetcher.Fetch(&u)
+	p := page.Parse(b, u)
 
 	link1, _ := url.ParseAbs("https://pagetest.com/example.com")
 	link2, _ := url.ParseAbs("https://pagetest.com/lol")

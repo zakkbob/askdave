@@ -1,13 +1,14 @@
-package url
+package url_test
 
 import (
+	"ZakkBob/AskDave/crawler/url"
 	"testing"
 )
 
 func TestUrlString(t *testing.T) {
-	testUrls := []Url{
+	testUrls := []url.Url{
 		{
-			HttpsProtocol, "www", "example", "com", 8080,
+			url.HttpsProtocol, "www", "example", "com", 8080,
 			[]string{
 				"privacy",
 			}, true,
@@ -17,7 +18,7 @@ func TestUrlString(t *testing.T) {
 			Tld:    "com",
 		},
 		{
-			Protocol: HttpProtocol,
+			Protocol: url.HttpProtocol,
 			Domain:   "example",
 			Tld:      "com",
 			Port:     80,
@@ -50,7 +51,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 	}
 
 	for _, expected := range testStrings {
-		parsed, err := ParseAbs(expected)
+		parsed, err := url.ParseAbs(expected)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -63,7 +64,7 @@ func TestParseAbsoluteUrl(t *testing.T) {
 }
 
 func TestParseRelativeUrl(t *testing.T) {
-	baseUrl, _ := ParseAbs("example.com/subdir")
+	baseUrl, _ := url.ParseAbs("example.com/subdir")
 
 	testStrings := []string{
 		"home.php",
@@ -88,7 +89,7 @@ func TestParseRelativeUrl(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseRel(testString, baseUrl)
+		parsed, err := url.ParseRel(testString, baseUrl)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -126,7 +127,7 @@ func TestIsFile(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseAbs(testString)
+		parsed, err := url.ParseAbs(testString)
 		if err != nil {
 			t.Error(err.Error())
 			continue
@@ -140,7 +141,7 @@ func TestIsFile(t *testing.T) {
 }
 
 func TestParseRelativeUrlWithFile(t *testing.T) {
-	baseUrl, _ := ParseAbs("example.com/subdir/index.html")
+	baseUrl, _ := url.ParseAbs("example.com/subdir/index.html")
 
 	testStrings := []string{
 		"home.php",
@@ -161,7 +162,7 @@ func TestParseRelativeUrlWithFile(t *testing.T) {
 	}
 
 	for i, testString := range testStrings {
-		parsed, err := ParseRel(testString, baseUrl)
+		parsed, err := url.ParseRel(testString, baseUrl)
 		if err != nil {
 			t.Error(err.Error())
 			continue
