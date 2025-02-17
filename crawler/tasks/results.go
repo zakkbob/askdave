@@ -13,12 +13,13 @@ type FailureReason = int
 const (
 	NoFailure FailureReason = iota
 	RobotsDisallowed
+	FetchFailed
 )
 
 type Results struct {
-	Robots       []RobotsResult     `json:"robots"`
-	Sitemaps     []string           `json:"sitemaps"`
-	Pages        []PageResult       `json:"pages"`
+	Robots       []RobotsResult     `json:"robots,omitempty"`
+	Sitemaps     []string           `json:"sitemaps,omitempty"`
+	Pages        []PageResult       `json:"pages,omitempty"`
 	RobotsChan   chan *RobotsResult `json:"-"`
 	SitemapsChan chan *string       `json:"-"`
 	PagesChan    chan *PageResult   `json:"-"`
@@ -29,15 +30,17 @@ type PageResult struct {
 	Url           *url.Url      `json:"url"`
 	Success       bool          `json:"success"`
 	FailureReason FailureReason `json:"failure_reason,omitempty"`
-	Changed       bool          `json:"changed"`
-	Page          *page.Page    `json:"page"`
+	Changed       bool          `json:"changed,omitempty"`
+	Page          *page.Page    `json:"page,omitempty"`
 }
 
 type RobotsResult struct {
-	Url       *url.Url             `json:"robots"`
-	Hash      hash.Hash            `json:"hash"`
-	Changed   bool                 `json:"changed"`
-	Validator *robots.UrlValidator `json:"validator"`
+	Url           *url.Url             `json:"robots"`
+	Success       bool                 `json:"success"`
+	FailureReason FailureReason        `json:"failure_reason,omitempty"`
+	Hash          hash.Hash            `json:"hash,omitempty"`
+	Changed       bool                 `json:"changed,omitempty"`
+	Validator     *robots.UrlValidator `json:"validator,omitempty"`
 }
 
 func (r *Results) ListenToChans() {

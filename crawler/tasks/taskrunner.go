@@ -34,19 +34,27 @@ func (r *TaskRunner) Run(concurrency int) {
 }
 
 // Attempts to crawl the next robots.txt in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextRobots() (bool, error) {
+func (r *TaskRunner) crawlNextRobots() bool {
 	u := r.Tasks.Robots.Next()
 	if u == nil {
-		return false, nil
+		return false
 	}
 	res, err := r.Fetcher.Fetch(u)
 	if err != nil {
-		return true, err
+		robotsResult := RobotsResult{
+			Url:           u,
+			Success:       false,
+			FailureReason: FetchFailed,
+		}
+
+		r.Results.RobotsChan <- &robotsResult
+		return true
 	}
 
 	validator, _ := robots.Parse(res.Body)
 	robotsResult := RobotsResult{
 		Url:       u,
+		Success:   true,
 		Changed:   true,
 		Hash:      hash.Hashs(res.Body),
 		Validator: &validator,
@@ -54,31 +62,38 @@ func (r *TaskRunner) crawlNextRobots() (bool, error) {
 
 	r.Results.RobotsChan <- &robotsResult
 
-	return true, nil
+	return true
 }
 
 // Attempts to crawl the next sitemap in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextSitemap() (bool, error) {
+func (r *TaskRunner) crawlNextSitemap() bool {
 	u := r.Tasks.Sitemaps.Next()
 	if u == nil {
-		return false, nil
+		return false
 	}
 	_, err := r.Fetcher.Fetch(u)
 	if err != nil {
-		return true, err
+		return true
 	}
-	return true, nil
+	return true
 }
 
 // Attempts to crawl the next page in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextPage() (bool, error) {
+func (r *TaskRunner) crawlNextPage() bool {
 	u := r.Tasks.Pages.Next()
 	if u == nil {
-		return false, nil
+		return false
 	}
 	res, err := r.Fetcher.Fetch(u)
 	if err != nil {
-		return true, err
+		pageResult := PageResult{
+			Url:           u,
+			Success:       false,
+			FailureReason: FetchFailed,
+		}
+
+		r.Results.PagesChan <- &pageResult
+		return true
 	}
 
 	p := page.Parse(res.Body, *u)
@@ -91,11 +106,11 @@ func (r *TaskRunner) crawlNextPage() (bool, error) {
 
 	r.Results.PagesChan <- &pageResult
 
-	return true, nil
+	return true
 }
 
 // Runs n goroutines, each calling t until it return false
-func loopConcurrently(t func() (bool, error), workers int) {
+func loopConcurrently(t func() bool, workers int) {
 	var wg sync.WaitGroup
 
 	for range workers {
@@ -103,10 +118,7 @@ func loopConcurrently(t func() (bool, error), workers int) {
 		go func() {
 			defer wg.Done()
 			for {
-				isNext, err := t()
-				if err != nil {
-					panic(err.Error())
-				}
+				isNext := t()
 				if !isNext {
 					break
 				}

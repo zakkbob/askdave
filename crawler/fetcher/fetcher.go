@@ -31,7 +31,7 @@ type NetFetcher struct{}
 func (f *NetFetcher) Fetch(u *url.Url) (Response, error) {
 	resp, err := http.Get(u.String())
 	if err != nil {
-		return Response{}, err
+		return Response{}, err // Get was unsuccessful, url probably doesnt exist or something, who knows
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
