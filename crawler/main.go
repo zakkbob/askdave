@@ -36,7 +36,7 @@ func main() {
 	// 	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
 	// }
 
-	u2, _ := url.ParseAbs("https://mateishome.page")
+	u2, _ := url.ParseAbs("https://emateishome.page")
 	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u2)
 
 	r.Run(1)

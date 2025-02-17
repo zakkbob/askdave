@@ -16,8 +16,8 @@ func TestFileFetcher(t *testing.T) {
 	s, _ := url.ParseAbs("https://fetchertest.com/index.html")
 	got, _ := f.Fetch(&s)
 	want := "Success"
-	if got != want {
-		t.Errorf("got '%s', wanted '%s'", got, want)
+	if got.Body != want {
+		t.Errorf("got '%s', wanted '%s'", got.Body, want)
 	}
 }
 
@@ -29,8 +29,8 @@ func TestDummyFetcher(t *testing.T) {
 	s, _ := url.ParseAbs("fetchertest.com/index.html")
 	got, _ := f.Fetch(&s)
 	want := "Success"
-	if got != want {
-		t.Errorf("got '%s', wanted '%s'", got, want)
+	if got.Body != want {
+		t.Errorf("got '%s', wanted '%s'", got.Body, want)
 	}
 }
 
@@ -58,7 +58,7 @@ func TestNetFetcher(t *testing.T) {
 		t.Fatalf("expected no error, but got: %v", err)
 	}
 
-	if got != want {
-		t.Errorf("got '%s', wanted '%s'", got, want)
+	if got.Body != want {
+		t.Errorf("got '%s', wanted '%s'", got.Body, want)
 	}
 }

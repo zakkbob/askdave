@@ -39,16 +39,16 @@ func (r *TaskRunner) crawlNextRobots() (bool, error) {
 	if u == nil {
 		return false, nil
 	}
-	b, err := r.Fetcher.Fetch(u)
+	res, err := r.Fetcher.Fetch(u)
 	if err != nil {
 		return true, err
 	}
 
-	validator, _ := robots.Parse(b)
+	validator, _ := robots.Parse(res.Body)
 	robotsResult := RobotsResult{
 		Url:       u,
 		Changed:   true,
-		Hash:      hash.Hashs(b),
+		Hash:      hash.Hashs(res.Body),
 		Validator: &validator,
 	}
 
@@ -76,12 +76,12 @@ func (r *TaskRunner) crawlNextPage() (bool, error) {
 	if u == nil {
 		return false, nil
 	}
-	b, err := r.Fetcher.Fetch(u)
+	res, err := r.Fetcher.Fetch(u)
 	if err != nil {
 		return true, err
 	}
 
-	p := page.Parse(b, *u)
+	p := page.Parse(res.Body, *u)
 	pageResult := PageResult{
 		Url:     u,
 		Success: true,

@@ -18,22 +18,31 @@ import (
 var files embed.FS
 
 type Fetcher interface {
-	Fetch(*url.Url) (string, error)
+	Fetch(*url.Url) (Response, error)
+}
+
+type Response struct {
+	Body       string
+	StatusCode int
 }
 
 type NetFetcher struct{}
 
-func (f *NetFetcher) Fetch(u *url.Url) (string, error) {
+func (f *NetFetcher) Fetch(u *url.Url) (Response, error) {
 	resp, err := http.Get(u.String())
 	if err != nil {
-		return "", err
+		return Response{}, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return Response{}, err
 	}
-	return string(body), nil
+
+	return Response{
+		Body:       string(body),
+		StatusCode: resp.StatusCode,
+	}, nil
 }
 
 type DummyFetcher struct {
@@ -60,20 +69,23 @@ func (f *DummyFetcher) sleep() time.Duration {
 }
 
 // returns DummyFetcher.response, the url parameter is ignored
-func (f *DummyFetcher) Fetch(u *url.Url) (string, error) {
+func (f *DummyFetcher) Fetch(u *url.Url) (Response, error) {
 	totalDelay := f.sleep()
 
 	if f.Debug {
 		fmt.Printf("fetched dummy url '%s' after %s\n", u.String(), totalDelay.String())
 	}
-	return f.Response, nil
+	return Response{
+		Body:       f.Response,
+		StatusCode: 200,
+	}, nil
 }
 
 type FileFetcher struct {
 	Debug bool
 }
 
-func (f *FileFetcher) Fetch(u *url.Url) (string, error) {
+func (f *FileFetcher) Fetch(u *url.Url) (Response, error) {
 	path := "testsites/"
 	path += u.FQDN() + u.PathString()
 	content, err := files.ReadFile(path)
@@ -83,7 +95,10 @@ func (f *FileFetcher) Fetch(u *url.Url) (string, error) {
 		fmt.Printf("content: '%s'\n", content)
 	}
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return Response{}, fmt.Errorf("failed to read file: %v", err)
 	}
-	return string(content), nil
+	return Response{
+		Body:       string(content),
+		StatusCode: 200,
+	}, nil
 }

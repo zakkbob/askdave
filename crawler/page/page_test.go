@@ -22,7 +22,7 @@ func TestParseBody(t *testing.T) {
 	fetcher := &fetcher.FileFetcher{}
 	u, _ := url.ParseAbs("https://pagetest.com/index.html")
 	b, _ := fetcher.Fetch(&u)
-	p := page.Parse(b, u)
+	p := page.Parse(b.Body, u)
 
 	link1, _ := url.ParseAbs("https://pagetest.com/example.com")
 	link2, _ := url.ParseAbs("https://pagetest.com/lol")
