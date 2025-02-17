@@ -250,6 +250,12 @@ func removeQuery(s string) string {
 }
 
 func ParseRel(s string, base Url) (Url, error) {
+	if s == "" {
+		var copy Url
+		base.Copy(&copy)
+		return copy, nil
+	}
+
 	absUrl, err := ParseAbs(s)
 
 	if err == nil && absUrl.Protocol != UnspecifiedProtocol {

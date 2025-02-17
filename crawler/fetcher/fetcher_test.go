@@ -5,7 +5,6 @@ import (
 	"ZakkBob/AskDave/crawler/url"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -43,17 +42,10 @@ func TestNetFetcher(t *testing.T) {
 	mockServer := httptest.NewServer(mockHandler)
 	defer mockServer.Close()
 
-	split := strings.Split(mockServer.URL, ".") //I apologise for this being so cursed. i really need to support ips
-
 	fetcher := &fetcher.NetFetcher{}
-	testUrl := url.Url{
-		Domain: split[0] + "." + split[1],
-		Tld:    split[2] + "." + split[3],
-		Path:   []string{"/test"},
-	}
 
 	want := "Success"
-	got, err := fetcher.Fetch(&testUrl)
+	got, err := fetcher.Fetch(mockServer.URL + "/test")
 	if err != nil {
 		t.Fatalf("expected no error, but got: %v", err)
 	}

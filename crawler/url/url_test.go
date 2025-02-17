@@ -176,6 +176,7 @@ func TestParseRelativeUrlWithFile(t *testing.T) {
 	baseUrl, _ := url.ParseAbs("example.com/subdir/index.html")
 
 	testStrings := []string{
+		"",
 		"home.php",
 		"/home.html",
 		"./home",
@@ -185,6 +186,7 @@ func TestParseRelativeUrlWithFile(t *testing.T) {
 	}
 
 	expectedStrings := []string{
+		"example.com/subdir/index.html",
 		"example.com/subdir/home.php",
 		"example.com/home.html",
 		"example.com/subdir/home",

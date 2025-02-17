@@ -5,6 +5,7 @@ import (
 	"ZakkBob/AskDave/crawler/page"
 	"ZakkBob/AskDave/crawler/robots"
 	"ZakkBob/AskDave/crawler/url"
+	"fmt"
 	"sync"
 )
 
@@ -17,14 +18,15 @@ const (
 )
 
 type Results struct {
-	Robots map[string]*RobotsResult `json:"robots,omitempty"`
+	Robots         map[string]*RobotsResult `json:"robots,omitempty"`
+	RobotsChan     chan *RobotsResult       `json:"-"`
+	RobotsFinished chan bool                `json:"-"`
+	robotMu        sync.RWMutex             `json:"-"`
+	Pages          map[string]*PageResult   `json:"pages,omitempty"`
+	PagesChan      chan *PageResult         `json:"-"`
+	PagesFinished  chan bool                `json:"-"`
 	// Sitemaps     map[string]*string       `json:"sitemaps,omitempty"`
-	Pages      map[string]*PageResult `json:"pages,omitempty"`
-	RobotsChan chan *RobotsResult     `json:"-"`
 	// SitemapsChan chan *string           `json:"-"`
-	PagesChan      chan *PageResult `json:"-"`
-	RobotsFinished chan bool        `json:"-"`
-	PagesFinished  chan bool        `json:"-"`
 }
 
 type PageResult struct {
@@ -44,6 +46,24 @@ type RobotsResult struct {
 	Validator     *robots.UrlValidator `json:"validator,omitempty"`
 }
 
+func (r *Results) CheckRobots(u url.Url) (bool, error) {
+	robotsUrl, err := url.ParseRel("/robots.txt", u)
+	robotsUrl.TrailingSlash = false //normalise the url
+
+	if err != nil {
+		return false, fmt.Errorf("checking robots: %v", err)
+	}
+
+	r.robotMu.RLock()
+	defer r.robotMu.RUnlock()
+	robotResult, ok := r.Robots[robotsUrl.String()]
+	if !ok {
+		return true, nil
+	}
+
+	return robotResult.Validator.ValidateUrl(&u), nil
+}
+
 func (r *Results) ListenToChans() {
 	var wg sync.WaitGroup
 
@@ -56,6 +76,8 @@ func (r *Results) ListenToChans() {
 				r.RobotsFinished <- true
 				return
 			}
+			r.robotMu.Lock()
+			defer r.robotMu.Unlock()
 			r.Robots[robotsResult.Url.String()] = robotsResult
 		}
 	}()

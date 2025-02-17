@@ -18,7 +18,7 @@ import (
 var files embed.FS
 
 type Fetcher interface {
-	Fetch(*url.Url) (Response, error)
+	Fetch(string) (Response, error)
 }
 
 type Response struct {
@@ -28,8 +28,8 @@ type Response struct {
 
 type NetFetcher struct{}
 
-func (f *NetFetcher) Fetch(u *url.Url) (Response, error) {
-	resp, err := http.Get(u.String())
+func (f *NetFetcher) Fetch(u string) (Response, error) {
+	resp, err := http.Get(u)
 	if err != nil {
 		return Response{}, err // Get was unsuccessful, url probably doesnt exist or something, who knows
 	}

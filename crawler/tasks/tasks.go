@@ -23,7 +23,8 @@ func (t *taskSlice) Next() (url.Url, bool) {
 	if len(t.Slice) == 0 {
 		return url.Url{}, false
 	}
-	u := t.Slice[0]
+	var u url.Url
+	t.Slice[0].Copy(&u)
 	t.Slice = t.Slice[1:len(t.Slice)]
 	return u, true
 }

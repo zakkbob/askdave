@@ -3,14 +3,13 @@ package main
 import (
 	"ZakkBob/AskDave/crawler/fetcher"
 	"ZakkBob/AskDave/crawler/tasks"
-	"ZakkBob/AskDave/crawler/url"
 	"encoding/json"
 	"fmt"
 )
 
 func main() {
 	r := tasks.TaskRunner{
-		Fetcher: &fetcher.FileFetcher{},
+		Fetcher: &fetcher.NetFetcher{},
 		Results: tasks.Results{
 			Robots:     make(map[string]*tasks.RobotsResult),
 			Pages:      make(map[string]*tasks.PageResult),
@@ -39,16 +38,50 @@ func main() {
 	// 	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
 	// }
 
-	u1, _ := url.ParseAbs("https://taskrunnertest.com/robots.txt")
-	r.Tasks.Robots.Slice = append(r.Tasks.Robots.Slice, u1)
+	// 	data :=
+	// 		`{
+	//   "robots": {
+	//     "slice": [
+	//       "https://taskrunnertest.com/robots.txt/e"
+	//     ]
+	//   },
+	//   "sitemaps": {
+	//     "slice": null
+	//   },
+	//   "pages": {
+	//     "slice": [
+	//       "https://taskrunnertest.com/index.html",
+	//       "https://taskrunnertest.com/cats.html",
+	// 	  "https://taskrunnertest.com/notfound.php",
+	// 	  "https://taskrunnertest.com/disallowed/secrets.txt"
+	//     ]
+	//   }
+	// }`
 
-	u1, _ = url.ParseAbs("https://taskrunnertest.com/index.html")
-	u2, _ := url.ParseAbs("https://taskrunnertest.com/cats.html")
-	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u1, u2)
+	data :=
+		`{
+"robots": {
+"slice": null
+},
+"sitemaps": {
+"slice": null
+},
+"pages": {
+"slice": [
+"https://mateishome.page"
+]
+}
+}`
 
-	r.Run(1)
+	var t tasks.Tasks
+	json.Unmarshal([]byte(data), &t)
 
-	j, _ := json.MarshalIndent(r.Results, "", "  ")
+	r.Tasks.Pages = t.Pages
+	r.Tasks.Robots = t.Robots
+
+	r.Run(5)
+
+	j, _ := json.MarshalIndent(&r.Results, "", "  ")
 
 	fmt.Println(string(j))
 }

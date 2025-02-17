@@ -9,11 +9,12 @@ import (
 	"ZakkBob/AskDave/crawler/hash"
 	"ZakkBob/AskDave/crawler/page"
 	"ZakkBob/AskDave/crawler/robots"
+	"ZakkBob/AskDave/crawler/url"
+	"fmt"
 	"sync"
 )
 
 type TaskRunner struct {
-	// mu      sync.Mutex
 	Tasks   Tasks
 	Results Results
 	Fetcher fetcher.Fetcher
@@ -42,10 +43,14 @@ func (r *TaskRunner) crawlNextRobots() bool {
 	if !ok {
 		return false
 	}
-	res, err := r.Fetcher.Fetch(&u)
+
+	robotsTxtUrl, _ := url.ParseRel("/robots.txt", u)
+	robotsTxtUrl.TrailingSlash = false //normalise the url
+
+	res, err := r.Fetcher.Fetch(robotsTxtUrl.String())
 	if err != nil {
 		robotsResult := RobotsResult{
-			Url:           &u,
+			Url:           &robotsTxtUrl,
 			Success:       false,
 			FailureReason: FetchFailed,
 		}
@@ -56,7 +61,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 
 	validator, _ := robots.Parse(res.Body)
 	robotsResult := RobotsResult{
-		Url:       &u,
+		Url:       &robotsTxtUrl,
 		Success:   true,
 		Changed:   true,
 		Hash:      hash.Hashs(res.Body),
@@ -88,29 +93,25 @@ func (r *TaskRunner) crawlNextPage() bool {
 		return false
 	}
 
-	robotsUrl := u
-	robotsUrl.Path = []string{"robots.txt"}
-	robotsUrl.TrailingSlash = false
+	robotsAllowed, err := r.Results.CheckRobots(u)
 
-	// r.mu.Lock()
-	// defer r.mu.Unlock()
-	robots, ok := r.Results.Robots[robotsUrl.String()]
-
-	if ok {
-		valid := robots.Validator.ValidateUrl(&u)
-		if !valid {
-			pageResult := PageResult{
-				Url:           &u,
-				Success:       false,
-				FailureReason: RobotsDisallowed,
-			}
-
-			r.Results.PagesChan <- &pageResult
-			return true
-		}
+	if err != nil {
+		fmt.Printf("error: crawling next robots: %v\n", err)
+		return true
 	}
 
-	res, err := r.Fetcher.Fetch(&u)
+	if !robotsAllowed {
+		pageResult := PageResult{
+			Url:           &u,
+			Success:       false,
+			FailureReason: RobotsDisallowed,
+		}
+
+		r.Results.PagesChan <- &pageResult
+		return true
+	}
+
+	res, err := r.Fetcher.Fetch(u.String())
 	if err != nil {
 		pageResult := PageResult{
 			Url:           &u,
