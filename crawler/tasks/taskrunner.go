@@ -13,6 +13,7 @@ import (
 )
 
 type TaskRunner struct {
+	// mu      sync.Mutex
 	Tasks   Tasks
 	Results Results
 	Fetcher fetcher.Fetcher
@@ -24,25 +25,27 @@ func (r *TaskRunner) Run(concurrency int) {
 	loopConcurrently(r.crawlNextRobots, concurrency)
 	close(r.Results.RobotsChan)
 
-	loopConcurrently(r.crawlNextSitemap, concurrency)
-	close(r.Results.SitemapsChan)
+	<-r.Results.RobotsFinished
+
+	// loopConcurrently(r.crawlNextSitemap, concurrency)
+	// close(r.Results.SitemapsChan)
 
 	loopConcurrently(r.crawlNextPage, concurrency)
 	close(r.Results.PagesChan)
 
-	<-r.Results.Finished
+	<-r.Results.PagesFinished
 }
 
 // Attempts to crawl the next robots.txt in the taskList, returns false if no more
 func (r *TaskRunner) crawlNextRobots() bool {
-	u := r.Tasks.Robots.Next()
-	if u == nil {
+	u, ok := r.Tasks.Robots.Next()
+	if !ok {
 		return false
 	}
-	res, err := r.Fetcher.Fetch(u)
+	res, err := r.Fetcher.Fetch(&u)
 	if err != nil {
 		robotsResult := RobotsResult{
-			Url:           u,
+			Url:           &u,
 			Success:       false,
 			FailureReason: FetchFailed,
 		}
@@ -53,7 +56,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 
 	validator, _ := robots.Parse(res.Body)
 	robotsResult := RobotsResult{
-		Url:       u,
+		Url:       &u,
 		Success:   true,
 		Changed:   true,
 		Hash:      hash.Hashs(res.Body),
@@ -66,28 +69,51 @@ func (r *TaskRunner) crawlNextRobots() bool {
 }
 
 // Attempts to crawl the next sitemap in the taskList, returns false if no more
-func (r *TaskRunner) crawlNextSitemap() bool {
-	u := r.Tasks.Sitemaps.Next()
-	if u == nil {
-		return false
-	}
-	_, err := r.Fetcher.Fetch(u)
-	if err != nil {
-		return true
-	}
-	return true
-}
+// func (r *TaskRunner) crawlNextSitemap() bool {
+// 	u := r.Tasks.Sitemaps.Next()
+// 	if u == nil {
+// 		return false
+// 	}
+// 	_, err := r.Fetcher.Fetch(u)
+// 	if err != nil {
+// 		return true
+// 	}
+// 	return true
+// }
 
 // Attempts to crawl the next page in the taskList, returns false if no more
 func (r *TaskRunner) crawlNextPage() bool {
-	u := r.Tasks.Pages.Next()
-	if u == nil {
+	u, ok := r.Tasks.Pages.Next()
+	if !ok {
 		return false
 	}
-	res, err := r.Fetcher.Fetch(u)
+
+	robotsUrl := u
+	robotsUrl.Path = []string{"robots.txt"}
+	robotsUrl.TrailingSlash = false
+
+	// r.mu.Lock()
+	// defer r.mu.Unlock()
+	robots, ok := r.Results.Robots[robotsUrl.String()]
+
+	if ok {
+		valid := robots.Validator.ValidateUrl(&u)
+		if !valid {
+			pageResult := PageResult{
+				Url:           &u,
+				Success:       false,
+				FailureReason: RobotsDisallowed,
+			}
+
+			r.Results.PagesChan <- &pageResult
+			return true
+		}
+	}
+
+	res, err := r.Fetcher.Fetch(&u)
 	if err != nil {
 		pageResult := PageResult{
-			Url:           u,
+			Url:           &u,
 			Success:       false,
 			FailureReason: FetchFailed,
 		}
@@ -96,9 +122,9 @@ func (r *TaskRunner) crawlNextPage() bool {
 		return true
 	}
 
-	p := page.Parse(res.Body, *u)
+	p := page.Parse(res.Body, u)
 	pageResult := PageResult{
-		Url:     u,
+		Url:     &u,
 		Success: true,
 		Changed: true,
 		Page:    &p,

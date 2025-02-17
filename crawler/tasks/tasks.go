@@ -17,13 +17,13 @@ type taskSlice struct {
 }
 
 // Returns next url in slice, returns nil if slice is empty
-func (t *taskSlice) Next() *url.Url {
+func (t *taskSlice) Next() (url.Url, bool) {
 	t.Mu.Lock()
 	defer t.Mu.Unlock()
 	if len(t.Slice) == 0 {
-		return nil
+		return url.Url{}, false
 	}
-	u := &t.Slice[0]
+	u := t.Slice[0]
 	t.Slice = t.Slice[1:len(t.Slice)]
-	return u
+	return u, true
 }

@@ -99,6 +99,16 @@ func (u *Url) FQDN() string {
 	return s
 }
 
+func (u *Url) Copy(dst *Url) {
+	dst.Protocol = u.Protocol
+	dst.Subdomain = u.Subdomain
+	dst.Domain = u.Domain
+	dst.Tld = u.Tld
+	dst.Port = u.Port
+	dst.TrailingSlash = u.TrailingSlash
+	copy(dst.Path, u.Path)
+}
+
 func (u *Url) String() string {
 	s := ""
 
@@ -245,11 +255,14 @@ func ParseRel(s string, base Url) (Url, error) {
 		return absUrl, nil
 	}
 
+	var newUrl Url
+	base.Copy(&newUrl)
+
 	s = removeQuery(s)
 
 	if s == "/" {
-		base.Path = []string{}
-		return base, nil
+		newUrl.Path = []string{}
+		return newUrl, nil
 	}
 
 	relPathRegex := regexp.MustCompile(`(\.?\.?\/)?(.+)`)
@@ -262,14 +275,14 @@ func ParseRel(s string, base Url) (Url, error) {
 	if matches[1] == "./" || matches[1] == "../" || matches[1] == "" {
 		path := strings.Split(matches[0], "/")
 
-		if base.IsFile() {
-			base.Path = base.Path[:len(base.Path)-1]
+		if newUrl.IsFile() {
+			newUrl.Path = newUrl.Path[:len(newUrl.Path)-1]
 		}
-		base.Path = normalisePath(append(base.Path, path...))
-		return normalise(base), nil
+		newUrl.Path = normalisePath(append(newUrl.Path, path...))
+		return normalise(newUrl), nil
 	} else if matches[1] == "/" {
-		base.Path = strings.Split(matches[2], "/")
-		return normalise(base), nil
+		newUrl.Path = strings.Split(matches[2], "/")
+		return normalise(newUrl), nil
 	}
 
 	if err != nil {

@@ -5,6 +5,7 @@
 package robots
 
 import (
+	"ZakkBob/AskDave/crawler/url"
 	"bufio"
 	"fmt"
 	"regexp"
@@ -16,11 +17,16 @@ type UrlValidator struct {
 	DisallowedPatterns []*regexp.Regexp `json:"disallowed_patterns"`
 }
 
-func (validator *UrlValidator) Validate(url string) bool {
+func (validator *UrlValidator) ValidateUrl(u *url.Url) bool {
+	path := u.PathString()
+	return validator.ValidatePath(path)
+}
+
+func (validator *UrlValidator) ValidatePath(path string) bool {
 	longestMatch := 0
 	isValid := true
 	for _, pattern := range validator.AllowedPatterns {
-		indices := pattern.FindStringIndex(url)
+		indices := pattern.FindStringIndex(path)
 		if indices == nil {
 			continue
 		}
@@ -31,7 +37,7 @@ func (validator *UrlValidator) Validate(url string) bool {
 		}
 	}
 	for _, pattern := range validator.DisallowedPatterns {
-		indices := pattern.FindStringIndex(url)
+		indices := pattern.FindStringIndex(path)
 		if indices == nil {
 			continue
 		}
@@ -87,8 +93,9 @@ func extractDavebotDirectives(userAgentBlocks map[string]string) (directives str
 }
 
 func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
-	pattern = "^" + pattern                          // match start of string
-	pattern = strings.ReplaceAll(pattern, "*", ".+") //wildcard
+	pattern = regexp.QuoteMeta(pattern)               //escape special chars
+	pattern = "^" + pattern                           // match start of string
+	pattern = strings.ReplaceAll(pattern, `\*`, ".*") //wildcard
 
 	regex, err = regexp.Compile(pattern)
 
@@ -129,6 +136,10 @@ func generateUrlValidator(directives string) UrlValidator {
 
 		name := strings.ToLower(strings.TrimSpace(directive[1]))
 		value := strings.TrimSpace(directive[2])
+
+		if value == "" {
+			continue
+		}
 
 		regex, err := convertToRegex(value)
 		if err != nil {

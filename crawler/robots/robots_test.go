@@ -38,6 +38,7 @@ func TestUrlValidator(t *testing.T) {
 	testUrls := map[string]bool{
 		"/allowed-dir":                              true,
 		"/disallowed":                               false,
+		"/cats.html":                                false,
 		"/disallowed/subdir":                        false,
 		"/disallowed/nevermind-this-is-allowed":     true,
 		"/disallowed/nevermind-this-is-allowed/lol": true,
@@ -50,9 +51,23 @@ func TestUrlValidator(t *testing.T) {
 	}
 
 	for url, want := range testUrls {
-		got := validator.Validate(url)
+		got := validator.ValidatePath(url)
 		if got != want {
 			t.Errorf("'%s' got %t, wanted %t", url, got, want)
+		}
+	}
+}
+
+func TestUrlValidatorDisallowAll(t *testing.T) {
+	robotsTxt := "User-agent: *\nDisallow:*"
+
+	validator, _ := robots.Parse(robotsTxt)
+
+	for range 1000 {
+		url := "/e"
+		got := validator.ValidatePath(url)
+		if got != false {
+			t.Errorf("'%s' was allowed, should be disallowed", url)
 		}
 	}
 }

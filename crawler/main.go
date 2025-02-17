@@ -10,12 +10,15 @@ import (
 
 func main() {
 	r := tasks.TaskRunner{
-		Fetcher: &fetcher.NetFetcher{},
+		Fetcher: &fetcher.FileFetcher{},
 		Results: tasks.Results{
-			RobotsChan:   make(chan *tasks.RobotsResult, 5),
-			SitemapsChan: make(chan *string, 5),
-			PagesChan:    make(chan *tasks.PageResult, 5),
-			Finished:     make(chan bool, 1),
+			Robots:     make(map[string]*tasks.RobotsResult),
+			Pages:      make(map[string]*tasks.PageResult),
+			RobotsChan: make(chan *tasks.RobotsResult, 5),
+			// SitemapsChan: make(chan *string, 5),
+			PagesChan:      make(chan *tasks.PageResult, 5),
+			RobotsFinished: make(chan bool, 1),
+			PagesFinished:  make(chan bool, 1),
 		},
 	}
 
@@ -36,8 +39,12 @@ func main() {
 	// 	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u)
 	// }
 
-	u2, _ := url.ParseAbs("https://emateishome.page")
-	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u2)
+	u1, _ := url.ParseAbs("https://taskrunnertest.com/robots.txt")
+	r.Tasks.Robots.Slice = append(r.Tasks.Robots.Slice, u1)
+
+	u1, _ = url.ParseAbs("https://taskrunnertest.com/index.html")
+	u2, _ := url.ParseAbs("https://taskrunnertest.com/cats.html")
+	r.Tasks.Pages.Slice = append(r.Tasks.Pages.Slice, u1, u2)
 
 	r.Run(1)
 

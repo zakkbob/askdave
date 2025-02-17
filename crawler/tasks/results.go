@@ -17,13 +17,14 @@ const (
 )
 
 type Results struct {
-	Robots       []RobotsResult     `json:"robots,omitempty"`
-	Sitemaps     []string           `json:"sitemaps,omitempty"`
-	Pages        []PageResult       `json:"pages,omitempty"`
-	RobotsChan   chan *RobotsResult `json:"-"`
-	SitemapsChan chan *string       `json:"-"`
-	PagesChan    chan *PageResult   `json:"-"`
-	Finished     chan bool          `json:"-"`
+	Robots map[string]*RobotsResult `json:"robots,omitempty"`
+	// Sitemaps     map[string]*string       `json:"sitemaps,omitempty"`
+	Pages      map[string]*PageResult `json:"pages,omitempty"`
+	RobotsChan chan *RobotsResult     `json:"-"`
+	// SitemapsChan chan *string           `json:"-"`
+	PagesChan      chan *PageResult `json:"-"`
+	RobotsFinished chan bool        `json:"-"`
+	PagesFinished  chan bool        `json:"-"`
 }
 
 type PageResult struct {
@@ -46,37 +47,40 @@ type RobotsResult struct {
 func (r *Results) ListenToChans() {
 	var wg sync.WaitGroup
 
-	wg.Add(3)
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		for {
 			robotsResult, ok := <-r.RobotsChan
 			if !ok && robotsResult == nil {
+				r.RobotsFinished <- true
 				return
 			}
-			r.Robots = append(r.Robots, *robotsResult)
+			r.Robots[robotsResult.Url.String()] = robotsResult
 		}
 	}()
-	go func() {
-		defer wg.Done()
-		for {
-			sitemapResult, ok := <-r.SitemapsChan
-			if !ok && sitemapResult == nil {
-				return
-			}
-			r.Sitemaps = append(r.Sitemaps, *sitemapResult)
-		}
-	}()
+	// wg.Add(1)
+	// go func() {
+	// 	defer wg.Done()
+	// 	for {
+	// 		sitemapResult, ok := <-r.SitemapsChan
+	// 		if !ok && sitemapResult == nil {
+	// 			return
+	// 		}
+	// 		r.Sitemaps[sitemapResult.Url.String()] = sitemapResult
+	// 	}
+	// }()
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		for {
 			pageResult, ok := <-r.PagesChan
 			if !ok && pageResult == nil {
+				r.PagesFinished <- true
 				return
 			}
-			r.Pages = append(r.Pages, *pageResult)
+			r.Pages[pageResult.Url.String()] = pageResult
 		}
 	}()
 	wg.Wait()
-	r.Finished <- true
 }

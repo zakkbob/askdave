@@ -7,6 +7,7 @@ Disall: /invalid-directive
 Disallow: /disallowed
 Allow: /disallowed/nevermind-this-is-allowed #comment
 Disallow: /*.php # OMMMENT##CMMMENT IN COMMENT /eee
+Disallow: /cats.html
 Disallow: /endline$
 Disallow:/allow-subdir/
 Allow: /allow-subdir/*
