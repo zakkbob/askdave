@@ -143,6 +143,35 @@ func TestIsFile(t *testing.T) {
 	}
 }
 
+func TestUrlCopy(t *testing.T) {
+	compare, _ := url.ParseAbs("https://www.google.com:123/pizza/lol/fun/subdir/") //for checking changes
+	original, _ := url.ParseAbs("https://www.google.com:123/pizza/lol/fun/subdir/")
+	var copy url.Url
+	original.Copy(&copy)
+
+	if original.String() != copy.String() {
+		t.Errorf("copied '%s', but got '%s'", original.String(), copy.String())
+	}
+
+	original.Domain = "lol"
+	original.Subdomain = "lol"
+	original.Port = 2
+	original.Protocol = url.UnspecifiedProtocol
+	original.Tld = "lol"
+	original.TrailingSlash = false
+	original.Path[0] = "lol" //check if changing an index in the array is reflected
+
+	if copy.String() != compare.String() {
+		t.Errorf("modified original '%s', but copy also changed '%s'", original.String(), copy.String())
+	}
+
+	original.Path = []string{"lol", "lol"} //check is reassigning is reflected
+
+	if copy.String() != compare.String() {
+		t.Errorf("modified original '%s', but copy also changed '%s'", original.String(), copy.String())
+	}
+}
+
 func TestParseRelativeUrlWithFile(t *testing.T) {
 	baseUrl, _ := url.ParseAbs("example.com/subdir/index.html")
 

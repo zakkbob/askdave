@@ -106,6 +106,7 @@ func (u *Url) Copy(dst *Url) {
 	dst.Tld = u.Tld
 	dst.Port = u.Port
 	dst.TrailingSlash = u.TrailingSlash
+	dst.Path = make([]string, len(u.Path))
 	copy(dst.Path, u.Path)
 }
 
