@@ -96,6 +96,7 @@ func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
 	pattern = regexp.QuoteMeta(pattern)               //escape special chars
 	pattern = "^" + pattern                           // match start of string
 	pattern = strings.ReplaceAll(pattern, `\*`, ".*") //wildcard
+	pattern = strings.ReplaceAll(pattern, `\$`, "$")  //endline
 
 	regex, err = regexp.Compile(pattern)
 

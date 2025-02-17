@@ -45,8 +45,8 @@ func TestUrlValidator(t *testing.T) {
 		"/main.php":                                 false,
 		"/endline":                                  false,
 		"/endline/not-lol":                          true,
-		"/allowed-dir/disallowed-php.php":           false,
-		"/allow-subdir/":                            false,
+		"/allowed-dir/disallowed-php.php":           false, //should this be allowed or not?? (ambiguous)
+		"/allow-subdir/":                            true,
 		"/allow-subdir/e":                           true,
 	}
 
