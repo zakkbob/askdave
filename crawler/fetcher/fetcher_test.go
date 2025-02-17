@@ -2,7 +2,6 @@ package fetcher_test
 
 import (
 	"ZakkBob/AskDave/crawler/fetcher"
-	"ZakkBob/AskDave/crawler/url"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,8 +11,7 @@ func TestFileFetcher(t *testing.T) {
 	var f = fetcher.FileFetcher{
 		Debug: true,
 	}
-	s, _ := url.ParseAbs("https://fetchertest.com/index.html")
-	got, _ := f.Fetch(&s)
+	got, _ := f.Fetch("https://fetchertest.com/index.html")
 	want := "Success"
 	if got.Body != want {
 		t.Errorf("got '%s', wanted '%s'", got.Body, want)
@@ -25,8 +23,7 @@ func TestDummyFetcher(t *testing.T) {
 		Debug:    true,
 		Response: "Success",
 	}
-	s, _ := url.ParseAbs("fetchertest.com/index.html")
-	got, _ := f.Fetch(&s)
+	got, _ := f.Fetch("fetchertest.com/index.html")
 	want := "Success"
 	if got.Body != want {
 		t.Errorf("got '%s', wanted '%s'", got.Body, want)

@@ -69,11 +69,11 @@ func (f *DummyFetcher) sleep() time.Duration {
 }
 
 // returns DummyFetcher.response, the url parameter is ignored
-func (f *DummyFetcher) Fetch(u *url.Url) (Response, error) {
+func (f *DummyFetcher) Fetch(u string) (Response, error) {
 	totalDelay := f.sleep()
 
 	if f.Debug {
-		fmt.Printf("fetched dummy url '%s' after %s\n", u.String(), totalDelay.String())
+		fmt.Printf("fetched dummy url '%s' after %s\n", u, totalDelay.String())
 	}
 	return Response{
 		Body:       f.Response,
@@ -82,17 +82,42 @@ func (f *DummyFetcher) Fetch(u *url.Url) (Response, error) {
 }
 
 type FileFetcher struct {
-	Debug bool
+	Delay     time.Duration
+	RandDelay time.Duration
+	Debug     bool
 }
 
-func (f *FileFetcher) Fetch(u *url.Url) (Response, error) {
+func (f *FileFetcher) sleep() time.Duration {
+	if f.Delay == 0 && f.RandDelay == 0 {
+		return 0
+	}
+
+	if f.RandDelay == 0 {
+		time.Sleep(f.Delay)
+		return f.Delay
+	}
+
+	extraDelay := time.Duration(rand.Int() % (int(f.RandDelay)))
+	totalDelay := f.Delay + extraDelay
+	time.Sleep(totalDelay)
+	return totalDelay
+}
+
+func (f *FileFetcher) Fetch(s string) (Response, error) {
+	totalDelay := f.sleep()
+
+	u, err := url.ParseAbs(s)
+	if err != nil {
+		return Response{}, fmt.Errorf("fetching file: %v", err)
+	}
+
 	path := "testsites/"
 	path += u.FQDN() + u.PathString()
 	content, err := files.ReadFile(path)
 	if f.Debug {
-		fmt.Printf("fetching file url '%s'\n", u.String())
+		fmt.Printf("fetching file url '%s' after %s\n", u.String(), totalDelay.String())
 		fmt.Printf("path: '%s'\n", path)
-		fmt.Printf("content: '%s'\n", content)
+		// fmt.Printf("content: '%s'\n", content)
 	}
 	if err != nil {
 		return Response{}, fmt.Errorf("failed to read file: %v", err)
