@@ -1,6 +1,6 @@
-//-------------------------------------------------------------//
-// An interface for fetching webpages and some implementations //
-//-------------------------------------------------------------//
+//------------------------------------------------------//
+// An interface for fetching webpages, and some structs //
+//------------------------------------------------------//
 
 package fetcher
 
@@ -26,10 +26,15 @@ type Response struct {
 	StatusCode int
 }
 
-type NetFetcher struct{}
+type NetFetcher struct {
+	Debug bool
+}
 
 func (f *NetFetcher) Fetch(u string) (Response, error) {
 	resp, err := http.Get(u)
+	if f.Debug {
+		fmt.Printf("fetching url '%s'\n", u)
+	}
 	if err != nil {
 		return Response{}, err // Get was unsuccessful, url probably doesnt exist or something, who knows
 	}
@@ -38,7 +43,9 @@ func (f *NetFetcher) Fetch(u string) (Response, error) {
 	if err != nil {
 		return Response{}, err
 	}
-
+	if f.Debug {
+		fmt.Printf("fetched url '%s'\n", u)
+	}
 	return Response{
 		Body:       string(body),
 		StatusCode: resp.StatusCode,
@@ -120,7 +127,11 @@ func (f *FileFetcher) Fetch(s string) (Response, error) {
 		// fmt.Printf("content: '%s'\n", content)
 	}
 	if err != nil {
-		return Response{}, fmt.Errorf("failed to read file: %v", err)
+		fmt.Printf("fetching file url '%s': %v\n", u.String(), err)
+		return Response{
+			Body:       "",
+			StatusCode: 404,
+		}, nil
 	}
 	return Response{
 		Body:       string(content),

@@ -61,6 +61,10 @@ func (r *Results) CheckRobots(u url.Url) (bool, error) {
 		return true, nil
 	}
 
+	if !robotResult.Success { //robots.txt couldnt be fetched
+		return true, nil
+	}
+
 	return robotResult.Validator.ValidateUrl(&u), nil
 }
 
@@ -77,8 +81,8 @@ func (r *Results) ListenToChans() {
 				return
 			}
 			r.robotMu.Lock()
-			defer r.robotMu.Unlock()
 			r.Robots[robotsResult.Url.String()] = robotsResult
+			r.robotMu.Unlock()
 		}
 	}()
 	// wg.Add(1)

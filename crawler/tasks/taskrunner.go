@@ -48,7 +48,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 	robotsTxtUrl.TrailingSlash = false //normalise the url
 
 	res, err := r.Fetcher.Fetch(robotsTxtUrl.String())
-	if err != nil {
+	if err != nil || res.StatusCode != 200 {
 		robotsResult := RobotsResult{
 			Url:           &robotsTxtUrl,
 			Success:       false,
