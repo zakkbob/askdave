@@ -5,11 +5,12 @@
 package robots
 
 import (
-	"ZakkBob/AskDave/gocommon/url"
 	"bufio"
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type UrlValidator struct {
