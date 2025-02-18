@@ -1,8 +1,9 @@
 package tasks
 
 import (
-	"ZakkBob/AskDave/crawler/url"
 	"sync"
+
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type Tasks struct {

@@ -1,13 +1,13 @@
 package tasks
 
 import (
-	"ZakkBob/AskDave/crawler/url"
-	"ZakkBob/AskDave/gocommon/hash"
-	"ZakkBob/AskDave/gocommon/page"
 	"fmt"
 	"sync"
 
+	"github.com/ZakkBob/AskDave/gocommon/hash"
+	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/robots"
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type FailureReason = int
