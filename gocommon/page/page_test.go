@@ -19,8 +19,7 @@ func TestAddLink(t *testing.T) {
 }
 
 func TestParseBody(t *testing.T) {
-	b := `
-	<!DOCTYPE html>
+	b := `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -76,6 +75,6 @@ func TestParseBody(t *testing.T) {
 		}
 	}
 	if expectedPage.Hash != p.Hash {
-		t.Errorf("got url '%s', expected '%s'", expectedPage.Hash, p.Hash)
+		t.Errorf("got hash '%s', expected '%s'", expectedPage.Hash.String(), p.Hash.String())
 	}
 }
