@@ -5,13 +5,14 @@
 package fetcher
 
 import (
-	"ZakkBob/AskDave/crawler/url"
 	"embed"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 //go:embed testsites/*
