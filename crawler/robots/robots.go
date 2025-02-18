@@ -2,25 +2,31 @@
 // Processes robots.txt into a struct //
 //------------------------------------//
 
-package main
+package robots
 
 import (
+	"ZakkBob/AskDave/crawler/url"
 	"bufio"
 	"fmt"
 	"regexp"
 	"strings"
 )
 
-type urlValidator struct {
-	allowedPatterns    []*regexp.Regexp
-	disallowedPatterns []*regexp.Regexp
+type UrlValidator struct {
+	AllowedPatterns    []*regexp.Regexp `json:"allowed_patterns"`
+	DisallowedPatterns []*regexp.Regexp `json:"disallowed_patterns"`
 }
 
-func (validator *urlValidator) validate(url string) bool {
+func (validator *UrlValidator) ValidateUrl(u *url.Url) bool {
+	path := u.PathString()
+	return validator.ValidatePath(path)
+}
+
+func (validator *UrlValidator) ValidatePath(path string) bool {
 	longestMatch := 0
 	isValid := true
-	for _, pattern := range validator.allowedPatterns {
-		indices := pattern.FindStringIndex(url)
+	for _, pattern := range validator.AllowedPatterns {
+		indices := pattern.FindStringIndex(path)
 		if indices == nil {
 			continue
 		}
@@ -30,8 +36,8 @@ func (validator *urlValidator) validate(url string) bool {
 			isValid = true
 		}
 	}
-	for _, pattern := range validator.disallowedPatterns {
-		indices := pattern.FindStringIndex(url)
+	for _, pattern := range validator.DisallowedPatterns {
+		indices := pattern.FindStringIndex(path)
 		if indices == nil {
 			continue
 		}
@@ -87,8 +93,10 @@ func extractDavebotDirectives(userAgentBlocks map[string]string) (directives str
 }
 
 func convertToRegex(pattern string) (regex *regexp.Regexp, err error) {
-	pattern = "^" + pattern                          // match start of string
-	pattern = strings.ReplaceAll(pattern, "*", ".+") //wildcard
+	pattern = regexp.QuoteMeta(pattern)               //escape special chars
+	pattern = "^" + pattern                           // match start of string
+	pattern = strings.ReplaceAll(pattern, `\*`, ".*") //wildcard
+	pattern = strings.ReplaceAll(pattern, `\$`, "$")  //endline
 
 	regex, err = regexp.Compile(pattern)
 
@@ -110,8 +118,8 @@ func removeComments(s string) string {
 	return noComments
 }
 
-func generateUrlValidator(directives string) urlValidator {
-	validator := urlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
+func generateUrlValidator(directives string) UrlValidator {
+	validator := UrlValidator{make([]*regexp.Regexp, 0), make([]*regexp.Regexp, 0)}
 
 	scanner := bufio.NewScanner(strings.NewReader(directives))
 	directiveRegex := regexp.MustCompile("(?i)(.*?):(.*)")
@@ -130,6 +138,10 @@ func generateUrlValidator(directives string) urlValidator {
 		name := strings.ToLower(strings.TrimSpace(directive[1]))
 		value := strings.TrimSpace(directive[2])
 
+		if value == "" {
+			continue
+		}
+
 		regex, err := convertToRegex(value)
 		if err != nil {
 			continue
@@ -137,16 +149,16 @@ func generateUrlValidator(directives string) urlValidator {
 
 		switch name {
 		case "disallow":
-			validator.disallowedPatterns = append(validator.disallowedPatterns, regex)
+			validator.DisallowedPatterns = append(validator.DisallowedPatterns, regex)
 		case "allow":
-			validator.allowedPatterns = append(validator.allowedPatterns, regex)
+			validator.AllowedPatterns = append(validator.AllowedPatterns, regex)
 		}
 	}
 
 	return validator
 }
 
-func ProcessRobotsTxt(content string) (validator urlValidator, sitemapUrl string) {
+func Parse(content string) (validator UrlValidator, sitemapUrl string) {
 	content = removeComments(content)
 	blocks := extractUserAgentBlocks(content)
 	directives := extractDavebotDirectives(blocks)
