@@ -92,3 +92,24 @@ jobs:
     - name: Test Backend
       working-directory: ./backend
       run: go test -v ./...
+  
+  test_common:      
+    name: gocommon test
+    permissions:
+      contents: read
+    needs: go_fmt
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+
+    - name: Set up Go (1.23.6)
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.6'
+        check-latest: true
+        cache-dependency-path: ./gocommon/go.sum
+
+    - name: Test Crawler
+      working-directory: ./crawler
+      run: go test -v ./...

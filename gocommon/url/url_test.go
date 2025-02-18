@@ -1,9 +1,10 @@
 package url_test
 
 import (
-	"ZakkBob/AskDave/crawler/url"
 	"encoding/json"
 	"testing"
+
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 func TestUrlString(t *testing.T) {
