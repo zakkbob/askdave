@@ -1,7 +1,7 @@
 package hash_test
 
 import (
-	"ZakkBob/AskDave/crawler/hash"
+	"ZakkBob/AskDave/gocommon/hash"
 	"encoding/json"
 	"testing"
 )

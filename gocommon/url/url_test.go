@@ -1,7 +1,7 @@
 package url_test
 
 import (
-	"ZakkBob/AskDave/crawler/url"
+	"ZakkBob/AskDave/gocommon/url"
 	"encoding/json"
 	"testing"
 )
