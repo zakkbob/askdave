@@ -5,8 +5,8 @@
 package page
 
 import (
-	"ZakkBob/AskDave/crawler/hash"
-	"ZakkBob/AskDave/crawler/url"
+	"ZakkBob/AskDave/gocommon/hash"
+	"ZakkBob/AskDave/gocommon/url"
 	"fmt"
 	"regexp"
 )

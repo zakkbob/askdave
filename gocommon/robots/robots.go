@@ -5,7 +5,7 @@
 package robots
 
 import (
-	"ZakkBob/AskDave/crawler/url"
+	"ZakkBob/AskDave/gocommon/url"
 	"bufio"
 	"fmt"
 	"regexp"

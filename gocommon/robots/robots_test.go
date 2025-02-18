@@ -1,7 +1,7 @@
 package robots_test
 
 import (
-	"ZakkBob/AskDave/crawler/robots"
+	"ZakkBob/AskDave/gocommon/robots"
 	"os"
 	"testing"
 )
