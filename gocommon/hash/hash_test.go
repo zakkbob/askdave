@@ -1,9 +1,10 @@
 package hash_test
 
 import (
-	"ZakkBob/AskDave/crawler/hash"
 	"encoding/json"
 	"testing"
+
+	"github.com/ZakkBob/AskDave/gocommon/hash"
 )
 
 func TestHashs(t *testing.T) {
