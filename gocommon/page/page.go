@@ -5,10 +5,11 @@
 package page
 
 import (
-	"ZakkBob/AskDave/crawler/hash"
-	"ZakkBob/AskDave/crawler/url"
 	"fmt"
 	"regexp"
+
+	"github.com/ZakkBob/AskDave/gocommon/hash"
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type Page struct {
