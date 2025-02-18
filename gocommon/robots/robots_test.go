@@ -1,9 +1,10 @@
 package robots_test
 
 import (
-	"ZakkBob/AskDave/crawler/robots"
 	"os"
 	"testing"
+
+	"github.com/ZakkBob/AskDave/gocommon/robots"
 )
 
 func readRobotsTxt(t *testing.T, fileName string) string {

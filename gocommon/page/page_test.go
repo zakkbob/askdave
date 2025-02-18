@@ -1,10 +1,10 @@
 package page_test
 
 import (
-	"ZakkBob/AskDave/crawler/fetcher"
-	"ZakkBob/AskDave/crawler/page"
-	"ZakkBob/AskDave/crawler/url"
 	"testing"
+
+	"github.com/ZakkBob/AskDave/gocommon/page"
+	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 func TestAddLink(t *testing.T) {
@@ -19,10 +19,23 @@ func TestAddLink(t *testing.T) {
 }
 
 func TestParseBody(t *testing.T) {
-	fetcher := &fetcher.FileFetcher{}
+	b := `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Page</title>
+    <meta property="og:site_name" content="og sitename">
+    <meta property="og:description" content="og description">
+    <meta property="og:title" content="og title">
+</head>
+<body>
+    <a href="example.com"></a>
+    <a href="./lol"></a>
+</body>
+</html>`
 	u, _ := url.ParseAbs("https://pagetest.com/index.html")
-	b, _ := fetcher.Fetch(u.String())
-	p := page.Parse(b.Body, u)
+	p := page.Parse(b, u)
 
 	link1, _ := url.ParseAbs("https://pagetest.com/example.com")
 	link2, _ := url.ParseAbs("https://pagetest.com/lol")
@@ -62,6 +75,6 @@ func TestParseBody(t *testing.T) {
 		}
 	}
 	if expectedPage.Hash != p.Hash {
-		t.Errorf("got url '%s', expected '%s'", expectedPage.Hash, p.Hash)
+		t.Errorf("got hash '%s', expected '%s'", expectedPage.Hash.String(), p.Hash.String())
 	}
 }

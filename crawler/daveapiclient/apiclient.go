@@ -1,13 +1,14 @@
 package daveapiclient
 
 import (
-	"ZakkBob/AskDave/crawler/fetcher"
-	"ZakkBob/AskDave/crawler/tasks"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/ZakkBob/AskDave/crawler/fetcher"
+	"github.com/ZakkBob/AskDave/crawler/tasks"
 )
 
 type DaveApiClient struct {

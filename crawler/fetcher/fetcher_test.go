@@ -1,10 +1,11 @@
 package fetcher_test
 
 import (
-	"ZakkBob/AskDave/crawler/fetcher"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ZakkBob/AskDave/crawler/fetcher"
 )
 
 func TestFileFetcher(t *testing.T) {
