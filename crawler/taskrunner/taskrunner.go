@@ -2,7 +2,7 @@
 // Works through all crawl tasks //
 //-------------------------------//
 
-package tasks
+package taskrunner
 
 import (
 	"fmt"
@@ -51,10 +51,10 @@ func (r *TaskRunner) crawlNextRobots() bool {
 
 	res, err := r.Fetcher.Fetch(robotsTxtUrl.String())
 	if err != nil || res.StatusCode != 200 {
-		robotsResult := RobotsResult{
+		robotsResult := tasks.RobotsResult{
 			Url:           &robotsTxtUrl,
 			Success:       false,
-			FailureReason: FetchFailed,
+			FailureReason: tasks.FetchFailed,
 		}
 
 		r.Results.RobotsChan <- &robotsResult
@@ -62,7 +62,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 	}
 
 	validator, _ := robots.Parse(res.Body)
-	robotsResult := RobotsResult{
+	robotsResult := tasks.RobotsResult{
 		Url:       &robotsTxtUrl,
 		Success:   true,
 		Changed:   true,
@@ -103,10 +103,10 @@ func (r *TaskRunner) crawlNextPage() bool {
 	}
 
 	if !robotsAllowed {
-		pageResult := PageResult{
+		pageResult := tasks.PageResult{
 			Url:           &u,
 			Success:       false,
-			FailureReason: RobotsDisallowed,
+			FailureReason: tasks.RobotsDisallowed,
 		}
 
 		r.Results.PagesChan <- &pageResult
@@ -115,10 +115,10 @@ func (r *TaskRunner) crawlNextPage() bool {
 
 	res, err := r.Fetcher.Fetch(u.String())
 	if err != nil {
-		pageResult := PageResult{
+		pageResult := tasks.PageResult{
 			Url:           &u,
 			Success:       false,
-			FailureReason: FetchFailed,
+			FailureReason: tasks.FetchFailed,
 		}
 
 		r.Results.PagesChan <- &pageResult
@@ -126,7 +126,7 @@ func (r *TaskRunner) crawlNextPage() bool {
 	}
 
 	p := page.Parse(res.Body, u)
-	pageResult := PageResult{
+	pageResult := tasks.PageResult{
 		Url:     &u,
 		Success: true,
 		Changed: true,
