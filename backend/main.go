@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/ZakkBob/AskDave/gocommon/url"
+	"github.com/gin-gonic/gin"
 )
+
+var _, _ = url.ParseAbs("") //keep import
 
 type album struct {
 	ID     string  `json:"id"`
