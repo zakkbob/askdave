@@ -8,11 +8,12 @@ import (
 	"strings"
 
 	"github.com/ZakkBob/AskDave/crawler/fetcher"
+	"github.com/ZakkBob/AskDave/crawler/taskrunner"
 	"github.com/ZakkBob/AskDave/gocommon/tasks"
 )
 
 type DaveApiClient struct {
-	TaskRunner tasks.TaskRunner
+	TaskRunner taskrunner.TaskRunner
 	Url        string
 }
 
@@ -86,7 +87,7 @@ func (d *DaveApiClient) Run() {
 
 func Create(u string) DaveApiClient {
 	return DaveApiClient{
-		TaskRunner: tasks.TaskRunner{
+		TaskRunner: taskrunner.TaskRunner{
 			Tasks:   tasks.Tasks{},
 			Results: tasks.Results{},
 			Fetcher: &fetcher.NetFetcher{},
