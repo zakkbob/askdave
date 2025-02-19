@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ZakkBob/AskDave/crawler/fetcher"
-	"github.com/ZakkBob/AskDave/crawler/tasks"
+	"github.com/ZakkBob/AskDave/gocommon/tasks"
 )
 
 type DaveApiClient struct {
