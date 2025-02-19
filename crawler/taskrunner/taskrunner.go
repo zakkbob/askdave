@@ -12,12 +12,13 @@ import (
 	"github.com/ZakkBob/AskDave/gocommon/hash"
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/robots"
+	"github.com/ZakkBob/AskDave/gocommon/tasks"
 	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type TaskRunner struct {
-	Tasks   Tasks
-	Results Results
+	Tasks   tasks.Tasks
+	Results tasks.Results
 	Fetcher fetcher.Fetcher
 }
 
