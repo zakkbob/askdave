@@ -14,9 +14,9 @@ import (
 
 type Page struct {
 	Url           url.Url   `json:"url"`
-	Title         string    `json:"title"`
+	Title       string    `json:"title"`
 	OgTitle       string    `json:"og_title"`
-	OgDescription string    `json:"og_description"`
+	OgDescription string   `json:"og_description"`
 	OgSiteName    string    `json:"og_site_name"`
 	Links         []url.Url `json:"links"`
 	Hash          hash.Hash `json:"hash"`
@@ -29,7 +29,7 @@ func (p *Page) AddLink(u url.Url) {
 // Parses webpage body (string) into a page struct
 func Parse(body string, u url.Url) Page {
 	var p = Page{
-		Url:           u,
+		Url:         u,
 		Title:         extractTitle(body),
 		OgTitle:       extractMeta(body, "title"),
 		OgDescription: extractMeta(body, "description"),

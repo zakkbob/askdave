@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/ZakkBob/AskDave/gocommon/url"
-	"github.com/gin-gonic/gin"
+"github.com/gin-gonic/gin"
 )
 
 var _, _ = url.ParseAbs("") //keep import
 
 type album struct {
-	ID     string  `json:"id"`
+	ID   string  `json:"id"`
 	Title  string  `json:"title"`
 	Artist string  `json:"artist"`
 	Price  float64 `json:"price"`
