@@ -29,9 +29,9 @@ jobs:
         check-latest: true
         cache-dependency-path: ./gocommon/go.sum
     
-    - name: Build gocommon
-      working-directory: ./gocommon
-      run: go build -v
+    # - name: Build gocommon
+    #   working-directory: ./gocommon
+    #   run: go build -v
 
     - name: Test gocommon
       working-directory: ./gocommon

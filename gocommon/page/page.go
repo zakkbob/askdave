@@ -41,7 +41,7 @@ func Parse(body string, u url.Url) Page {
 }
 
 func extractMeta(Page string, metaProperty string) string {
-	metaElRegexString := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", metaProperty) //Temporary fix, won't work if content contains a '>'
+	metaElRegexString := fmt.Sprintf("(?s)<meta[^>]*?property=\"og:%s\"[^>]*?>", metaProperty) //Temporary fix, won't work if content contains a '>' :(
 
 	metaElRegex := regexp.MustCompile(metaElRegexString)
 	metaContentRegex := regexp.MustCompile("(?s)content=\"(.*?)\"")
