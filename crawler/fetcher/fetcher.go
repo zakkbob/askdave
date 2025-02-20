@@ -37,12 +37,12 @@ func (f *NetFetcher) Fetch(u string) (Response, error) {
 		fmt.Printf("fetching url '%s'\n", u)
 	}
 	if err != nil {
-		return Response{}, fmt.Errorf("couldn't fetch url: %s", err) // Get was unsuccessful, url probably doesnt exist or something, who knows
+		return Response{}, fmt.Errorf("fetching url: %s", err) // Get was unsuccessful, url probably doesnt exist or something, who knows
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{}, fmt.Errorf("couldn't fetch url: %s", err)
+		return Response{}, fmt.Errorf("fetching url: %s", err)
 	}
 	if f.Debug {
 		fmt.Printf("fetched url '%s'\n", u)
