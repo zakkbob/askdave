@@ -15,7 +15,11 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'crawler/**'
+      - 'gocommon/**'
   schedule:
     - cron: '0 0 * * *'
 
