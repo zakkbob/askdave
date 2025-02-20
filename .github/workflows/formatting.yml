@@ -1,0 +1,47 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Auto Formatting
+
+on:
+#  push:
+#    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go_fmt:
+    name: Format Go Code
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
+          # This is important to fetch the changes to the previous commit
+          fetch-depth: 0
+      
+      - name: Run gofmt on crawler
+        working-directory: ./crawler
+        run: go fmt .
+
+      - name: Run gofmt on backend
+        working-directory: ./backend
+        run: go fmt .
+      
+      - name: Run gofmt on gocommon
+        working-directory: ./gocommon
+        run: go fmt .
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@7e6142f95833a1ed8a1cd89f2469d1d6d6f95dc8
+        with:
+          default_author: github_actions
+          message: 'chore: fix formatting'

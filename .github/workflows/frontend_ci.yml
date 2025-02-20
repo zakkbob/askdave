@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Frontend Build
+    name: Frontend Build (Nodejs)
     permissions:
       contents: read
     runs-on: ubuntu-latest
