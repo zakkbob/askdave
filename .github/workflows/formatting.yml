@@ -30,15 +30,15 @@ jobs:
       
       - name: Run gofmt on crawler
         working-directory: ./crawler
-        run: go fmt .
+        run: go fmt ./...
 
       - name: Run gofmt on backend
         working-directory: ./backend
-        run: go fmt .
+        run: go fmt ./...
       
       - name: Run gofmt on gocommon
         working-directory: ./gocommon
-        run: go fmt .
+        run: go fmt ./...
 
       - name: Commit and push changes
         uses: EndBug/add-and-commit@7e6142f95833a1ed8a1cd89f2469d1d6d6f95dc8
