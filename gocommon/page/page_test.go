@@ -10,6 +10,7 @@ import (
 func TestAddLink(t *testing.T) {
 	var p page.Page
 	expected := "https://google.com"
+
 	u, _ := url.ParseAbs(expected)
 	p.AddLink(u)
 	got := p.Links[0].String()

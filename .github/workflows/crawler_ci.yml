@@ -4,8 +4,6 @@
 name: Crawler CI (Go)
 
 on:
-#  push:
-#    branches: [ "main" ]
   pull_request:
     paths:
       - 'crawler/**'

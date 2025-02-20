@@ -4,12 +4,9 @@
 name: gocommon CI (Go)
 
 on:
-#  push:
-#    branches: [ "main" ]
   pull_request:
-#     branches: [ "main" ]
     paths:
-      - './gocommon/**'
+      - 'gocommon/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
