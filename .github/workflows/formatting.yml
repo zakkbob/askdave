@@ -4,10 +4,11 @@
 name: Auto Formatting
 
 on:
-#  push:
-#    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+      - 'crawler/**'
+      - 'gocommon/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
