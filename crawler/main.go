@@ -1,7 +1,7 @@
 package main
 
 import (
-"github.com/ZakkBob/AskDave/crawler/daveapiclient"
+	"github.com/ZakkBob/AskDave/crawler/daveapiclient"
 )
 
 func main() {
