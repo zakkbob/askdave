@@ -51,6 +51,32 @@ func (validator *UrlValidator) ValidatePath(path string) bool {
 	return isValid
 }
 
+func FromStrings(allowedS []string, disallowedS []string) (*UrlValidator, error) {
+	var allowedR []*regexp.Regexp
+	var disallowedR []*regexp.Regexp
+
+	for _, s := range allowedS {
+		r, err := regexp.Compile(s)
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse allowedStrings: %w", err)
+		}
+		allowedR = append(allowedR, r)
+	}
+
+	for _, s := range disallowedS {
+		r, err := regexp.Compile(s)
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse disallowedStrings: %w", err)
+		}
+		disallowedR = append(disallowedR, r)
+	}
+
+	return &UrlValidator{
+		AllowedPatterns:    allowedR,
+		DisallowedPatterns: disallowedR,
+	}, nil
+}
+
 func extractUserAgentBlocks(content string) (blocks map[string]string) {
 	blocks = make(map[string]string)
 
