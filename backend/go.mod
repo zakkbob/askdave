@@ -2,8 +2,10 @@ module github.com/ZakkBob/AskDave/backend
 
 go 1.24.0
 
+replace github.com/ZakkBob/AskDave/gocommon => ../gocommon
+
 require (
-	github.com/ZakkBob/AskDave/gocommon v0.0.0-20250219171555-c58391b47f06
+	github.com/ZakkBob/AskDave/gocommon v0.0.0
 	github.com/gin-gonic/gin v1.10.0
 )
 
