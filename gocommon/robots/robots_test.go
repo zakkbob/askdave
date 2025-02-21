@@ -72,3 +72,53 @@ func TestUrlValidatorDisallowAll(t *testing.T) {
 		}
 	}
 }
+
+func TestFromStrings(t *testing.T) {
+	// random patterns, probably a better way to do this :shruggie:
+	allowed := []string{
+		`^\\e//`,
+		`.*/\.*`,
+		"",
+	}
+	disallowed := []string{
+		`^/a/e.*`,
+		"\n*",
+		"/",
+		".*",
+	}
+
+	validator, err := robots.FromStrings(allowed, disallowed)
+
+	if err != nil {
+		t.Errorf("was not expecting error: %v", err)
+		return
+	}
+
+	expectedAllowedLen := len(allowed)
+	expectedDisallowedLen := len(disallowed)
+
+	allowedLen := len(validator.AllowedPatterns)
+	disallowedLen := len(validator.DisallowedPatterns)
+
+	if expectedAllowedLen != allowedLen {
+		t.Errorf("expected %d allowed patterns but got %d", expectedAllowedLen, allowedLen)
+	}
+
+	if expectedDisallowedLen != disallowedLen {
+		t.Errorf("expected %d disallowed patterns but got %d", expectedDisallowedLen, disallowedLen)
+	}
+
+	for i, expected := range allowed {
+		got := validator.AllowedPatterns[i].String()
+		if expected != got {
+			t.Errorf("expected '%s' at index %d (allowed patterns), but got '%s'", expected, i, got)
+		}
+	}
+
+	for i, expected := range disallowed {
+		got := validator.DisallowedPatterns[i].String()
+		if expected != got {
+			t.Errorf("expected '%s' at index %d (disallowed patterns), but got '%s'", expected, i, got)
+		}
+	}
+}
