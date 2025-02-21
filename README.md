@@ -1,11 +1,14 @@
-!! This project is under development and does not work yet !!
-
+> [!IMPORTANT]
+>  This project is under development and does not work yet !!
 # AskDave
 Why ask Google, when you can ask Dave?
 
-*WARNING - DAVE IS NOT A VERY SMART GUY*
+This is a hobby project, with the goal of creating a (mostly) usable search engine from scratch
 
--- **This Repo Has Really Cool Actions** --
+It is mainly written in go, with the frontend in vuejs
+(This is my first time using go, so my code may be a bit dodgy)
 
-# Project Roadmap
-[Detailed Roadmap](ROADMAP.md)
+#
+
+> [!NOTE]
+> **This Repo Has Really Cool Actions**, which took a perfectly reasonable amount of time to setup :)
