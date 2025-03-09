@@ -18,7 +18,7 @@ CREATE TABLE page (
   next_crawl date,
   crawl_interval int,
   interval_delta int,
-  assigned bool DEFAULT f NOT NULL
+  assigned bool DEFAULT FALSE NOT NULL
 );
 
 CREATE TYPE failure_reason AS ENUM ('NoFailure', 'RobotsDisallowed', 'FetchFailed');
