@@ -75,17 +75,13 @@ func SaveResults(dbpool PgxPoolIface, r *tasks.Results) error {
 			continue // temporary - should probably do something
 		}
 
-		_, err := dbpool.Exec(context.Background(), robotsQuery, robotsResult.Validator.AllowedPatterns, robotsResult.Validator.DisallowedPatterns, urlS)
+		_, err := dbpool.Exec(context.Background(), robotsQuery, robotsResult.Validator.AllowedStrings(), robotsResult.Validator.DisallowedStrings(), urlS)
 		if err != nil {
 			return fmt.Errorf("unable to save robots result: %v", err)
 		}
 	}
 
 	for urlS, pageResult := range r.Pages {
-		if !pageResult.Changed {
-			continue
-		}
-
 		// Add crawl to db
 		if pageResult.Success {
 			if pageResult.Changed {
