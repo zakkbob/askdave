@@ -196,7 +196,7 @@ func NextTasks(dbpool PgxPoolIface, n int) (*tasks.Tasks, error) {
 
 	rows, err := dbpool.Query(context.Background(), query, n)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to get next %d tasks: %v", n, err)
+		return nil, fmt.Errorf("unable to get next %d tasks: %v", n, err)
 	}
 	defer rows.Close()
 
@@ -222,7 +222,7 @@ func NextTasks(dbpool PgxPoolIface, n int) (*tasks.Tasks, error) {
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("Unable to get next %d tasks: %v", n, err)
+		return nil, fmt.Errorf("unable to get next %d tasks: %v", n, err)
 	}
 
 	return &t, nil
