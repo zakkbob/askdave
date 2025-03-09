@@ -6,8 +6,6 @@ import (
 	"github.com/pashagolub/pgxmock/v4"
 )
 
-type AnyTime struct{}
-
 func TestShouldGetValidatorByUrl(t *testing.T) {
 	mock, err := pgxmock.NewPool()
 	if err != nil {
@@ -15,8 +13,8 @@ func TestShouldGetValidatorByUrl(t *testing.T) {
 	}
 	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"allowed_patterns, disallowed_patterns"}).
-		AddRow([]string{"", ""})
+	rows := pgxmock.NewRows([]string{"allowed_patterns", "disallowed_patterns"}).
+		AddRow([]string{"", ""}, []string{"", ""})
 
 	mock.ExpectQuery(`SELECT`).
 		WithArgs("https://mateishome.page").
