@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ZakkBob/AskDave/gocommon/robots"
+	"github.com/stretchr/testify/assert"
 )
 
 func readRobotsTxt(t *testing.T, fileName string) string {
@@ -121,4 +122,42 @@ func TestFromStrings(t *testing.T) {
 			t.Errorf("expected '%s' at index %d (disallowed patterns), but got '%s'", expected, i, got)
 		}
 	}
+}
+
+func TestAllowedStrings(t *testing.T) {
+	allowed := []string{
+		`^\\e//`,
+		`.*/\.*`,
+		"",
+	}
+	disallowed := []string{
+		`^/a/e.*`,
+		"\n*",
+		"/",
+		".*",
+	}
+
+	validator, err := robots.FromStrings(allowed, disallowed)
+	assert.Nil(t, err)
+
+	assert.Equal(t, validator.AllowedStrings(), allowed, "allowed patterns should be equal")
+}
+
+func TestDisallowedStrings(t *testing.T) {
+	allowed := []string{
+		`^\\e//`,
+		`.*/\.*`,
+		"",
+	}
+	disallowed := []string{
+		`^/a/e.*`,
+		"\n*",
+		"/",
+		".*",
+	}
+
+	validator, err := robots.FromStrings(allowed, disallowed)
+	assert.Nil(t, err)
+
+	assert.Equal(t, validator.DisallowedStrings(), disallowed, "disallowed patterns should be equal")
 }
