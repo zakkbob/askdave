@@ -23,6 +23,22 @@ func (validator *UrlValidator) ValidateUrl(u *url.Url) bool {
 	return validator.ValidatePath(path)
 }
 
+func (validator *UrlValidator) AllowedStrings() []string {
+	var allowed []string
+	for _, regex := range validator.AllowedPatterns {
+		allowed = append(allowed, regex.String())
+	}
+	return allowed
+}
+
+func (validator *UrlValidator) DisallowedStrings() []string {
+	var disallowed []string
+	for _, regex := range validator.DisallowedPatterns {
+		disallowed = append(disallowed, regex.String())
+	}
+	return disallowed
+}
+
 func (validator *UrlValidator) ValidatePath(path string) bool {
 	longestMatch := 0
 	isValid := true
