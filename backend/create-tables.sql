@@ -13,11 +13,19 @@ CREATE TABLE site (
 
 CREATE TABLE page (
   id SERIAL PRIMARY KEY NOT NULL,
-  site_id integer references site(id) NOT NULL,
-  url varchar(2048) NOT NULL,
+
+  site integer references site(id) NOT NULL,
+  path varchar(2048) NOT NULL,
+  
+  title varchar(50),
+  og_title varchar(50),
+  og_description varchar(50),
+  og_sitename varchar(50),
+
   next_crawl date,
-  crawl_interval int,
-  interval_delta int,
+  crawl_interval integer,
+  interval_delta integer,
+
   assigned bool DEFAULT FALSE NOT NULL
 );
 
@@ -25,22 +33,18 @@ CREATE TYPE failure_reason AS ENUM ('NoFailure', 'RobotsDisallowed', 'FetchFaile
 
 CREATE TABLE crawl (
   id SERIAL PRIMARY KEY NOT NULL,
-  page_id integer references page(id) NOT NULL,
+  page integer references page(id) NOT NULL,
   datetime timestamp NOT NULL,
   success bool NOT NULL,
   failure_reason failure_reason,
   content_changed bool,
-  title varchar(50),
-  og_title varchar(50),
-  og_description varchar(50),
   hash uuid
 );
 
 CREATE TABLE link (
   id SERIAL PRIMARY KEY NOT NULL,
   src integer references page(id) NOT NULL,
-  dst varchar(2048) NOT NULL,
-  count integer NOT NULL
+  dst integer references page(id) NOT NULL,
 );
 
 CREATE TABLE robots (
