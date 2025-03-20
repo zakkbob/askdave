@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS album;
 DROP TABLE IF EXISTS crawl;
 DROP TABLE IF EXISTS link;
 DROP TABLE IF EXISTS page;
@@ -8,7 +7,7 @@ DROP TYPE IF EXISTS failure_reason;
 
 CREATE TABLE site (
   id SERIAL PRIMARY KEY NOT NULL,
-  url varchar(200) NOT NULL
+  url varchar(200) NOT NULL UNIQUE
 );
 
 CREATE TABLE page (
@@ -26,7 +25,9 @@ CREATE TABLE page (
   crawl_interval integer,
   interval_delta integer,
 
-  assigned bool DEFAULT FALSE NOT NULL
+  assigned bool DEFAULT FALSE NOT NULL,
+
+  UNIQUE (site, path)
 );
 
 CREATE TYPE failure_reason AS ENUM ('NoFailure', 'RobotsDisallowed', 'FetchFailed');
@@ -44,7 +45,7 @@ CREATE TABLE crawl (
 CREATE TABLE link (
   id SERIAL PRIMARY KEY NOT NULL,
   src integer references page(id) NOT NULL,
-  dst integer references page(id) NOT NULL,
+  dst integer references page(id) NOT NULL
 );
 
 CREATE TABLE robots (
