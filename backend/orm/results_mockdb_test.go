@@ -1,18 +1,17 @@
 package orm_test
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
+	"github.com/ZakkBob/AskDave/backend/orm"
 	_ "github.com/lib/pq"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
 )
-
-var db *sql.DB
 
 func TestMain(m *testing.M) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
@@ -55,11 +54,11 @@ func TestMain(m *testing.M) {
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	pool.MaxWait = 120 * time.Second
 	if err = pool.Retry(func() error {
-		db, err = sql.Open("postgres", databaseUrl)
+		orm.Connect(databaseUrl)
 		if err != nil {
 			return err
 		}
-		return db.Ping()
+		return orm.Ping(context.Background())
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}

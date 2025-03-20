@@ -3,7 +3,6 @@ package orm
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -26,15 +25,22 @@ func MockConnect(mock pgxmock.PgxPoolIface) {
 	dbpool = mock
 }
 
-func Connect() {
-	pool, err := pgxpool.New(context.Background(), "postgres://postgres:password@127.0.0.1:5432/postgres")
+func Connect(url string) error {
+	if url == "" {
+		url = "postgres://postgres:password@127.0.0.1:5432/postgres"
+	}
+	pool, err := pgxpool.New(context.Background(), url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
 	dbpool = pool
+	return nil
 }
 
 func Close() {
 	dbpool.Close()
+}
+
+func Ping(c context.Context) error {
+	return dbpool.Ping(c)
 }

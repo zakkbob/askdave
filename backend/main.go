@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	orm.Connect()
+	orm.Connect("")
 	defer orm.Close()
 }

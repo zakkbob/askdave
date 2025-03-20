@@ -27,7 +27,7 @@ func TestSaveNewPage(t *testing.T) {
 		Hash:          hash.Hashs(""),
 	}
 
-	orm.Connect()
+	orm.Connect("")
 	defer orm.Close()
 
 	_, err = orm.SaveNewSite("https://www.zakkdev.com")
