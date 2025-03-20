@@ -2,7 +2,6 @@ package orm
 
 import (
 	"context"
-	"date"
 	"time"
 
 	"fmt"
@@ -24,13 +23,13 @@ type OrmPage struct {
 	Assigned      bool
 }
 
-func (o *OrmPage) SaveCrawl(datetime date.Date, success bool, failureReason tasks.FailureReason, contentChanged bool, hash hash.Hash) error {
+func (o *OrmPage) SaveCrawl(datetime time.Time, success bool, failureReason tasks.FailureReason, contentChanged bool, hash hash.Hash) error {
 	query := `INSERT INTO crawl (page, datetime, success, failure_reason, content_changed, hash
 		VALUES ($1, $2, $3, $4, $5, %6);`
 
 	_, err := dbpool.Exec(context.Background(), query, o.id, datetime, success, failureReason, contentChanged, hash)
 	if err != nil {
-		return fmt.Errorf("unable to save crawl '%s' '%s' '%s' '%s' '%s' '%s': %v", datetime, success, failureReason, contentChanged, hash, err)
+		return fmt.Errorf("unable to save crawl '%v' '%v' '%v' '%v' '%v': %v", datetime, success, failureReason, contentChanged, hash, err)
 	}
 
 	return nil
@@ -90,7 +89,7 @@ func (o *OrmPage) updateLinks() error {
 	return nil
 }
 
-func (o *OrmPage) Save() error {
+func (o *OrmPage) Save(updateLinks bool) error {
 	s, err := SiteByUrl(o.Url.FQDN())
 	if err != nil {
 		return fmt.Errorf("unable to save page '%v': %v", o, err)
@@ -105,9 +104,11 @@ func (o *OrmPage) Save() error {
 		return fmt.Errorf("unable to save page '%v': %v", o, err)
 	}
 
-	err = o.updateLinks()
-	if err != nil {
-		return fmt.Errorf("unable to save page '%v': %v", o, err)
+	if updateLinks {
+		err = o.updateLinks()
+		if err != nil {
+			return fmt.Errorf("unable to save page '%v': %v", o, err)
+		}
 	}
 
 	return nil

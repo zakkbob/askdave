@@ -2,8 +2,8 @@ package orm
 
 import (
 	"context"
+	"time"
 
-	"date"
 	"fmt"
 
 	"github.com/ZakkBob/AskDave/gocommon/hash"
@@ -14,7 +14,7 @@ import (
 type OrmCrawl struct {
 	id             int
 	Url            url.Url
-	Datetime       date.Date
+	Datetime       time.Time
 	Success        bool
 	FailureReason  tasks.FailureReason
 	ContentChanged bool
