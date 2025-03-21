@@ -3,8 +3,8 @@ package orm_test
 import (
 	"context"
 	"fmt"
-	"testing"
 	"os"
+	"testing"
 	"time"
 
 	"github.com/ZakkBob/AskDave/backend/orm"
@@ -75,7 +75,7 @@ func TestMain(m *testing.M) {
 		fmt.Println("Error reading file:", err)
 		return
 	}
-	
+
 	_, err = orm.DbPool().Exec(context.Background(), string(data))
 	if err != nil {
 		log.Fatalf("Could not run setup file: %s", err)
