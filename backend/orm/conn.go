@@ -44,3 +44,7 @@ func Close() {
 func Ping(c context.Context) error {
 	return dbpool.Ping(c)
 }
+
+func DbPool() PgxPoolIface {
+	return dbpool
+}

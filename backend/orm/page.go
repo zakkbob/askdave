@@ -27,7 +27,7 @@ func (o *OrmPage) SaveCrawl(datetime time.Time, success bool, failureReason task
 	query := `INSERT INTO crawl (page, datetime, success, failure_reason, content_changed, hash
 		VALUES ($1, $2, $3, $4, $5, %6);`
 
-	_, err := dbpool.Exec(context.Background(), query, o.id, datetime, success, failureReason, contentChanged, hash)
+	_, err := dbpool.Exec(context.Background(), query, o.id, datetime, success, failureReason, contentChanged, hash.String())
 	if err != nil {
 		return fmt.Errorf("unable to save crawl '%v' '%v' '%v' '%v' '%v': %v", datetime, success, failureReason, contentChanged, hash, err)
 	}
@@ -36,8 +36,8 @@ func (o *OrmPage) SaveCrawl(datetime time.Time, success bool, failureReason task
 }
 
 func SaveNewPage(p page.Page) (OrmPage, error) {
-	query := `INSERT INTO page (site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	query := `INSERT INTO page (site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned, hash)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING id;`
 
 	nextCrawl := time.Now().AddDate(0, 0, 7)
@@ -55,7 +55,7 @@ func SaveNewPage(p page.Page) (OrmPage, error) {
 		return o, fmt.Errorf("unable to save new page '%v': %v", p, err)
 	}
 
-	row := dbpool.QueryRow(context.Background(), query, s.id, o.Url.PathString(), o.Title, o.OgTitle, o.OgDescription, o.OgSiteName, o.NextCrawl, o.CrawlInterval, o.IntervalDelta, o.Assigned)
+	row := dbpool.QueryRow(context.Background(), query, s.id, o.Url.PathString(), o.Title, o.OgTitle, o.OgDescription, o.OgSiteName, o.NextCrawl, o.CrawlInterval, o.IntervalDelta, o.Assigned, o.Hash.String())
 
 	err = row.Scan(&o.id)
 
@@ -96,10 +96,10 @@ func (o *OrmPage) Save(updateLinks bool) error {
 	}
 
 	query := `UPDATE page
-		SET site = $2, path = $3, title = $4, og_title = $5, og_description = $6, og_sitename = $7, next_crawl = $8, crawl_interval = $9, interval_delta = $10, assigned = $11
+		SET site = $2, path = $3, title = $4, og_title = $5, og_description = $6, og_sitename = $7, next_crawl = $8, crawl_interval = $9, interval_delta = $10, assigned = $11, hash = $12
 		WHERE link.id = $1;`
 
-	_, err = dbpool.Exec(context.Background(), query, o.id, s.id, o.Url.PathString(), o.Title, o.OgDescription, o.OgSiteName, o.NextCrawl, o.CrawlInterval, o.IntervalDelta, o.Assigned)
+	_, err = dbpool.Exec(context.Background(), query, o.id, s.id, o.Url.PathString(), o.Title, o.OgDescription, o.OgSiteName, o.NextCrawl, o.CrawlInterval, o.IntervalDelta, o.Assigned, o.Hash.String())
 	if err != nil {
 		return fmt.Errorf("unable to save page '%v': %v", o, err)
 	}
@@ -118,8 +118,15 @@ func pageFromRow(row pgx.Row) (OrmPage, error) {
 	var p OrmPage
 	var siteId int
 	var path string
+	var hashS string
 
-	err := row.Scan(p.id, siteId, path, p.Title, p.OgTitle, p.OgDescription, p.OgSiteName, p.NextCrawl, p.CrawlInterval, p.IntervalDelta, p.Assigned)
+	err := row.Scan(&p.id, &siteId, &path, &p.Title, &p.OgTitle, &p.OgDescription, &p.OgSiteName, &p.NextCrawl, &p.CrawlInterval, &p.IntervalDelta, &p.Assigned, &hashS)
+
+	if err != nil {
+		return p, err
+	}
+
+	p.Hash, err = hash.StrToHash(hashS)
 
 	if err != nil {
 		return p, err
@@ -151,7 +158,7 @@ func pageFromRow(row pgx.Row) (OrmPage, error) {
 }
 
 func PageByID(id int) (OrmPage, error) {
-	query := `SELECT id, site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned
+	query := `SELECT id, site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned, hash
 		FROM page
 		WHERE page.id = $1;`
 
@@ -167,11 +174,21 @@ func PageByID(id int) (OrmPage, error) {
 }
 
 func PageByUrl(urlS string) (OrmPage, error) {
-	query := `SELECT id, site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned
+	query := `SELECT id, site, path, title, og_title, og_description, og_sitename, next_crawl, crawl_interval, interval_delta, assigned, hash
 		FROM page
-		WHERE page.url = $1;`
+		WHERE page.site = $1 AND page.path = $2;`
 
-	row := dbpool.QueryRow(context.Background(), query, urlS)
+	u, err := url.ParseAbs(urlS)
+	if err != nil {
+		return OrmPage{}, fmt.Errorf("unable to get page from database for url '%s': %v", urlS, err)
+	}
+
+	s, err := SiteByUrl(u.StringNoPath())
+	if err != nil {
+		return OrmPage{}, fmt.Errorf("unable to get page from database for url '%s': %v", urlS, err)
+	}
+
+	row := dbpool.QueryRow(context.Background(), query, s.id, u.PathString())
 	p, err := pageFromRow(row)
 
 	if err != nil {

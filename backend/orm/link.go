@@ -23,7 +23,7 @@ func SaveNewLink(src OrmPage, dst OrmPage) (OrmLink, error) {
 
 	row := dbpool.QueryRow(context.Background(), query, src.id, dst.id)
 
-	err := row.Scan(l.id)
+	err := row.Scan(&l.id)
 	if err != nil {
 		return l, fmt.Errorf("unable to save new link with src '%s', dst '%s': %v", src.Url.String(), dst.Url.String(), err)
 	}
@@ -68,7 +68,7 @@ func linkFromRow(row scanInterface) (OrmLink, error) {
 	var srcId int
 	var dstId int
 
-	err := row.Scan(l.id, srcId, dstId)
+	err := row.Scan(&l.id, &srcId, &dstId)
 
 	if err != nil {
 		return OrmLink{}, fmt.Errorf("%v", err)
@@ -148,7 +148,7 @@ func LinkDstsBySrc(src string) ([]url.Url, error) {
 	}
 
 	for rows.Next() {
-		err := rows.Scan(urlS)
+		err := rows.Scan(&urlS)
 
 		if err != nil {
 			return []url.Url{}, fmt.Errorf("unable to get destinations from database for src '%s': %v", src, err)

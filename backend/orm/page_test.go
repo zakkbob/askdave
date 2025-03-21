@@ -6,7 +6,7 @@ import (
 	"github.com/ZakkBob/AskDave/gocommon/hash"
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/url"
-
+	"github.com/stretchr/testify/assert"
 	"github.com/ZakkBob/AskDave/backend/orm"
 )
 
@@ -27,9 +27,6 @@ func TestSaveNewPage(t *testing.T) {
 		Hash:          hash.Hashs(""),
 	}
 
-	orm.Connect("")
-	defer orm.Close()
-
 	_, err = orm.SaveNewSite("https://www.zakkdev.com")
 	if err != nil {
 		t.Errorf("didn't expect an error: %v", err)
@@ -39,4 +36,17 @@ func TestSaveNewPage(t *testing.T) {
 	if err != nil {
 		t.Errorf("didn't expect an error: %v", err)
 	}
+
+	ormPage, err := orm.PageByUrl(u.String())
+	if err != nil {
+		t.Errorf("didn't expect an error: %v", err)
+	}
+
+	assert.Equal(t, p.Url.String(), ormPage.Url.String())
+	assert.Equal(t, p.Title, ormPage.Title)
+	assert.Equal(t, p.OgTitle, ormPage.OgTitle)
+	assert.Equal(t, p.OgDescription, ormPage.OgDescription)
+	assert.Equal(t, p.OgSiteName, ormPage.OgSiteName)
+	assert.Equal(t, p.Links, ormPage.Links)
+	assert.Equal(t, p.Hash.String(), ormPage.Hash.String())
 }
