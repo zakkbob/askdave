@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/ZakkBob/AskDave/gocommon/url"
@@ -49,12 +48,7 @@ type RobotsResult struct {
 }
 
 func (r *Results) CheckRobots(u url.URL) (bool, error) {
-	robotsRef, err := url.Parse("/robots.txt")
-	if err != nil {
-		return false, fmt.Errorf("Failed to parse robots ref: %w", err)
-	}
-
-	robotsUrl := u.ResolveReference(robotsRef)
+	robotsUrl, _ := u.Parse("/robots.txt")
 
 	r.robotMu.RLock()
 	defer r.robotMu.RUnlock()

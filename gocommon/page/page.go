@@ -91,8 +91,10 @@ func extractLinks(body string, pageUrl url.URL) []url.URL {
 			continue
 		}
 
-		relativeUrl, _ := url.Parse(hrefMatches[1])
-		linkUrl := pageUrl.ResolveReference(relativeUrl)
+		linkUrl, err := pageUrl.Parse(hrefMatches[1])
+		if err != nil {
+			continue
+		}
 
 		pageLinks = append(pageLinks, *linkUrl)
 	}
