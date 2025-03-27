@@ -114,13 +114,13 @@ func (f *FileFetcher) sleep() time.Duration {
 func (f *FileFetcher) Fetch(s string) (Response, error) {
 	totalDelay := f.sleep()
 
-	u, err := url.ParseAbs(s)
+	u, err := url.Parse(s)
 	if err != nil {
-		return Response{}, fmt.Errorf("fetching file: %v", err)
+		return Response{}, fmt.Errorf("failed to parse url: %v", err)
 	}
 
 	path := "testsites/"
-	path += u.FQDN() + u.PathString()
+	path += u.Hostname() + u.EscapedPath()
 	content, err := files.ReadFile(path)
 	if f.Debug {
 		fmt.Printf("fetching file url '%s' after %s\n", u.String(), totalDelay.String())
