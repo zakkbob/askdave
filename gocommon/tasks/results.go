@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/ZakkBob/AskDave/gocommon/url"
+
 	"github.com/ZakkBob/AskDave/gocommon/hash"
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/robots"
-	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type FailureReason = int
@@ -31,7 +32,7 @@ type Results struct {
 }
 
 type PageResult struct {
-	Url           *url.Url      `json:"url"`
+	Url           *url.URL      `json:"url"`
 	Success       bool          `json:"success"`
 	FailureReason FailureReason `json:"failure_reason,omitempty"`
 	Changed       bool          `json:"changed,omitempty"`
@@ -39,7 +40,7 @@ type PageResult struct {
 }
 
 type RobotsResult struct {
-	Url           *url.Url             `json:"robots"`
+	Url           *url.URL             `json:"robots"`
 	Success       bool                 `json:"success"`
 	FailureReason FailureReason        `json:"failure_reason,omitempty"`
 	Hash          hash.Hash            `json:"hash,omitempty"`
@@ -47,16 +48,17 @@ type RobotsResult struct {
 	Validator     *robots.UrlValidator `json:"validator,omitempty"`
 }
 
-func (r *Results) CheckRobots(u url.Url) (bool, error) {
-	robotsUrl, err := url.ParseRel("/robots.txt", u)
-	robotsUrl.TrailingSlash = false //normalise the url
-
+func (r *Results) CheckRobots(u url.URL) (bool, error) {
+	robotsRef, err := url.Parse("/robots.txt")
 	if err != nil {
-		return false, fmt.Errorf("checking robots: %v", err)
+		return false, fmt.Errorf("Failed to parse robots ref: %w", err)
 	}
+
+	robotsUrl := u.ResolveReference(robotsRef)
 
 	r.robotMu.RLock()
 	defer r.robotMu.RUnlock()
+
 	robotResult, ok := r.Robots[robotsUrl.String()]
 	if !ok {
 		return true, nil

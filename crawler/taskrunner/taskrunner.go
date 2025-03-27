@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/ZakkBob/AskDave/gocommon/url"
+
 	"github.com/ZakkBob/AskDave/crawler/fetcher"
 	"github.com/ZakkBob/AskDave/gocommon/hash"
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/robots"
 	"github.com/ZakkBob/AskDave/gocommon/tasks"
-	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type TaskRunner struct {
@@ -46,13 +47,13 @@ func (r *TaskRunner) crawlNextRobots() bool {
 		return false
 	}
 
-	robotsTxtUrl, _ := url.ParseRel("/robots.txt", u)
-	robotsTxtUrl.TrailingSlash = false //normalise the url
+	robotsRef, _ := url.Parse("/robots.txt")
+	robotsTxtUrl := u.ResolveReference(robotsRef)
 
 	res, err := r.Fetcher.Fetch(robotsTxtUrl.String())
 	if err != nil || res.StatusCode != 200 {
 		robotsResult := tasks.RobotsResult{
-			Url:           &robotsTxtUrl,
+			Url:           robotsTxtUrl,
 			Success:       false,
 			FailureReason: tasks.FetchFailed,
 		}
@@ -63,7 +64,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 
 	validator, _ := robots.Parse(res.Body)
 	robotsResult := tasks.RobotsResult{
-		Url:       &robotsTxtUrl,
+		Url:       robotsTxtUrl,
 		Success:   true,
 		Changed:   true,
 		Hash:      hash.Hashs(res.Body),
