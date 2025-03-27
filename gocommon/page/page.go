@@ -6,28 +6,28 @@ package page
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
 
 	"github.com/ZakkBob/AskDave/gocommon/hash"
-	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type Page struct {
-	Url           url.Url   `json:"url"`
+	Url           url.URL   `json:"url"`
 	Title         string    `json:"title"`
 	OgTitle       string    `json:"og_title"`
 	OgDescription string    `json:"og_description"`
 	OgSiteName    string    `json:"og_site_name"`
-	Links         []url.Url `json:"links"`
+	Links         []url.URL `json:"links"`
 	Hash          hash.Hash `json:"hash"`
 }
 
-func (p *Page) AddLink(u url.Url) {
+func (p *Page) AddLink(u url.URL) {
 	p.Links = append(p.Links, u)
 }
 
 // Parses webpage body (string) into a page struct
-func Parse(body string, u url.Url) Page {
+func Parse(body string, u url.URL) Page {
 	var p = Page{
 		Url:           u,
 		Title:         extractTitle(body),
@@ -73,15 +73,15 @@ func extractTitle(page string) (pageTitle string) {
 	return pageTitle
 }
 
-func extractLinks(body string, pageUrl url.Url) []url.Url {
-	var pageLinks []url.Url
+func extractLinks(body string, pageUrl url.URL) []url.URL {
+	var pageLinks []url.URL
 
 	linkElRegex := regexp.MustCompile("(?s)<a.*?>") //Wont match if '>' is in the tag somewher :shruggie:
 	linkHrefRegex := regexp.MustCompile("(?s)href=\"(.*?)\"")
 
 	elMatches := linkElRegex.FindAllString(body, -1)
 	if len(elMatches) < 1 {
-		return []url.Url{}
+		return []url.URL{}
 	}
 
 	for _, linkEl := range elMatches {
@@ -90,14 +90,10 @@ func extractLinks(body string, pageUrl url.Url) []url.Url {
 			continue
 		}
 
-		linkUrl, err := url.ParseRel(hrefMatches[1], pageUrl)
+		relativeUrl, _ := url.Parse(hrefMatches[1])
+		linkUrl := pageUrl.ResolveReference(relativeUrl)
 
-		if err != nil {
-			fmt.Println(err.Error())
-			continue
-		}
-
-		pageLinks = append(pageLinks, linkUrl)
+		pageLinks = append(pageLinks, *linkUrl)
 	}
 
 	return pageLinks

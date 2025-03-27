@@ -7,10 +7,9 @@ package robots
 import (
 	"bufio"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
-
-	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 type UrlValidator struct {
@@ -18,8 +17,8 @@ type UrlValidator struct {
 	DisallowedPatterns []*regexp.Regexp `json:"disallowed_patterns"`
 }
 
-func (validator *UrlValidator) ValidateUrl(u *url.Url) bool {
-	path := u.PathString()
+func (validator *UrlValidator) ValidateUrl(u *url.URL) bool {
+	path := u.EscapedPath()
 	return validator.ValidatePath(path)
 }
 

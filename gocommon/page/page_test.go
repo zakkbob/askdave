@@ -1,17 +1,17 @@
 package page_test
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/ZakkBob/AskDave/gocommon/page"
-	"github.com/ZakkBob/AskDave/gocommon/url"
 )
 
 func TestAddLink(t *testing.T) {
 	var p page.Page
 	expected := "https://google.com"
-	u, _ := url.ParseAbs(expected)
-	p.AddLink(u)
+	u, _ := url.Parse(expected)
+	p.AddLink(*u)
 	got := p.Links[0].String()
 	if got != expected {
 		t.Errorf("got '%s', expected '%s'", got, expected)
@@ -34,21 +34,21 @@ func TestParseBody(t *testing.T) {
     <a href="./lol"></a>
 </body>
 </html>`
-	u, _ := url.ParseAbs("https://pagetest.com/index.html")
-	p := page.Parse(b, u)
+	u, _ := url.Parse("https://pagetest.com/index.html")
+	p := page.Parse(b, *u)
 
-	link1, _ := url.ParseAbs("https://pagetest.com/example.com")
-	link2, _ := url.ParseAbs("https://pagetest.com/lol")
+	link1, _ := url.Parse("https://pagetest.com/example.com")
+	link2, _ := url.Parse("https://pagetest.com/lol")
 
 	expectedHash := [16]byte{45, 70, 89, 213, 75, 88, 253, 138, 176, 54, 124, 87, 52, 175, 150, 50}
 
 	expectedPage := page.Page{
-		Url:           u,
+		Url:           *u,
 		Title:         "Example Page",
 		OgTitle:       "og title",
 		OgDescription: "og description",
 		OgSiteName:    "og sitename",
-		Links:         []url.Url{link1, link2},
+		Links:         []url.URL{*link1, *link2},
 		Hash:          expectedHash,
 	}
 
@@ -70,7 +70,7 @@ func TestParseBody(t *testing.T) {
 	for i, got := range p.Links {
 		want := expectedPage.Links[i]
 		if got.String() != want.String() {
-			t.Errorf("got links '%+v', expected '%v'", expectedPage.Links, p.Links)
+			t.Errorf("got links '%v', expected '%v'", p.Links, expectedPage.Links)
 			break
 		}
 	}
