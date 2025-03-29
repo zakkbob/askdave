@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ZakkBob/AskDave/gocommon/url"
-
 	"github.com/ZakkBob/AskDave/crawler/fetcher"
 	"github.com/ZakkBob/AskDave/gocommon/hash"
 	"github.com/ZakkBob/AskDave/gocommon/page"
@@ -47,8 +45,7 @@ func (r *TaskRunner) crawlNextRobots() bool {
 		return false
 	}
 
-	robotsRef, _ := url.Parse("/robots.txt")
-	robotsTxtUrl := u.ResolveReference(robotsRef)
+	robotsTxtUrl, _ := u.Parse("/robots.txt")
 
 	res, err := r.Fetcher.Fetch(robotsTxtUrl.String())
 	if err != nil || res.StatusCode != 200 {
