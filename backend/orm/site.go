@@ -37,9 +37,9 @@ func (o *OrmSite) Save() error {
 
 func CreateSite(u *url.URL, validator robots.UrlValidator, lastRobotsCrawl time.Time) (OrmSite, error) {
 	var s OrmSite
-	u.Path = ""
 
 	s.Url = *u
+	s.Url.Path = ""
 	s.Validator = validator
 	s.LastRobotsCrawl = lastRobotsCrawl
 
