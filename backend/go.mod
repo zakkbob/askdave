@@ -1,7 +1,6 @@
 module github.com/ZakkBob/AskDave/backend
 
 go 1.24.0
-
 replace github.com/ZakkBob/AskDave/gocommon => ../gocommon
 
 require github.com/gin-gonic/gin v1.10.0
@@ -30,6 +29,6 @@ require (
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
