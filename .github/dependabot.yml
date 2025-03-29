@@ -20,6 +20,10 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      go-deps:
+        patterns:
+          - "*"
     
   - package-ecosystem: "gomod"
     directory: "/backend/" 
@@ -27,6 +31,10 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      go-deps:
+        patterns:
+          - "*"
   
   - package-ecosystem: "gomod"
     directory: "/gocommon/" 
@@ -34,6 +42,10 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      go-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
     directory: "/frontend/"
@@ -41,3 +53,7 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
+    groups:
+      npm-deps:
+        patterns:
+          - "*"
