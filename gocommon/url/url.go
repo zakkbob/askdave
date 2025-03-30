@@ -5,6 +5,7 @@
 package url
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -83,4 +84,19 @@ func ParseMany(rawURLs []string) ([]*URL, error) {
 		urls = append(urls, u)
 	}
 	return urls, nil
+}
+
+func (u *URL) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.String())
+}
+
+func (u *URL) UnmarshalJSON(data []byte) error {
+	var s string
+	json.Unmarshal(data, &s)
+	tmp, err := url.Parse(s)
+	if err != nil {
+		return fmt.Errorf("failed to parse url: %w", err)
+	}
+	*u = URL{URL: *tmp}
+	return nil
 }
