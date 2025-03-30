@@ -38,5 +38,5 @@ func PostResults(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("%v")
+	// fmt.Printf("%v", results)
 }
