@@ -14,6 +14,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+const maxCrawlInterval = 60
+const minCrawlInterval = 7
+
 type OrmPage struct {
 	page.Page
 
@@ -39,6 +42,28 @@ func (p *OrmPage) Site() (OrmSite, error) {
 		return s, fmt.Errorf("failed to get page's site: %w", err)
 	}
 	return s, err
+}
+
+func (p *OrmPage) ScheduleNextCrawl(changed bool) {
+	if changed {
+		p.IntervalDelta--
+		if p.IntervalDelta > -1 {
+			p.IntervalDelta = -1
+		}
+	} else {
+		p.IntervalDelta++
+		if p.IntervalDelta < 1 {
+			p.IntervalDelta = 1
+		}
+	}
+
+	p.CrawlInterval += p.IntervalDelta
+	if p.CrawlInterval < minCrawlInterval {
+		p.CrawlInterval = minCrawlInterval
+	} else if p.CrawlInterval > maxCrawlInterval {
+		p.CrawlInterval = maxCrawlInterval
+	}
+	p.NextCrawl = p.NextCrawl.AddDate(0, 0, p.CrawlInterval)
 }
 
 // func (p *OrmPage) SaveCrawl(datetime time.Time, success bool, failureReason tasks.FailureReason, contentChanged bool, hash hash.Hash) error {
