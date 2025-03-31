@@ -1,9 +1,9 @@
 package orm
 
 import (
-	"github.com/ZakkBob/AskDave/gocommon/tasks"
+	"log"
 
-	"fmt"
+	"github.com/ZakkBob/AskDave/gocommon/tasks"
 )
 
 func SaveResults(r *tasks.Results) error {
@@ -18,7 +18,8 @@ func SaveResults(r *tasks.Results) error {
 
 		p, err := SiteByUrl(robotsResult.Url)
 
-		if err != nil { // should probably log this
+		if err != nil {
+			log.Println("failed to get site with url '%s' : %w", robotsResult.Url.String(), err)
 			continue
 		}
 
@@ -26,14 +27,16 @@ func SaveResults(r *tasks.Results) error {
 
 		err = p.Save()
 		if err != nil {
-			return fmt.Errorf("failed to save robots result: %w", err)
+			log.Println("failed to save robots result: %w", err)
+			continue
 		}
 	}
 
 	for _, pageResult := range r.Pages {
 		p, err := PageByUrl(pageResult.Url)
 		if err != nil {
-			return fmt.Errorf("failed to get page by url: %w", err)
+			log.Println("failed to get page by url: %w", err)
+			continue
 		}
 
 		// will be nil if failed
@@ -46,7 +49,8 @@ func SaveResults(r *tasks.Results) error {
 
 		err = p.Save()
 		if err != nil {
-			return fmt.Errorf("failed to save page result: %w", err)
+			log.Println("failed to save page result: %w", err)
+			continue
 		}
 
 		// err = p.SaveCrawl(time.Now(), pageResult.Success, pageResult.FailureReason, pageResult.Changed, pageResult.Page.Hash)
