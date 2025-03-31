@@ -2,6 +2,7 @@ package orm
 
 import (
 	"log"
+	"time"
 
 	"github.com/ZakkBob/AskDave/gocommon/tasks"
 )
@@ -24,6 +25,7 @@ func SaveResults(r *tasks.Results) error {
 		}
 
 		p.Validator = *robotsResult.Validator
+		p.LastRobotsCrawl = time.Now()
 
 		err = p.Save()
 		if err != nil {
