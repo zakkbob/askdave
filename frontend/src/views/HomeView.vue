@@ -4,12 +4,7 @@ import { computed, ref } from 'vue';
 
 
 
-const query = ref("e")
-
-
-const url = computed(() => {
-  return `http://localhost:8080/api/v1/search/?q=${encodeURIComponent(props.query)}`;
-})
+const query = ref("")
 
 function search() {
   router.push({ name: 'search', query: { q: query.value }})

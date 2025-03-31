@@ -11,7 +11,7 @@ const props = defineProps({
     },
 })
 
-const query = ref("e")
+const query = ref("")
 query.value = props.query
 
 
@@ -22,7 +22,10 @@ const url = computed(() => {
 const { data } = useFetch<String>(url, { refetch: true })
 
 const results = computed(() => {
-  return JSON.parse(data.value)
+  if (data.value != null){
+    return JSON.parse(data.value.toString())
+  }
+  return JSON.parse("{}")
 })
 
 function search() {
