@@ -1,81 +1,65 @@
 package orm
 
-// import (
-// 	"time"
+import (
+	"log"
+	"time"
 
-// 	"github.com/ZakkBob/AskDave/gocommon/tasks"
+	"github.com/ZakkBob/AskDave/gocommon/tasks"
+)
 
-// 	"context"
-// 	"fmt"
-// )
+func SaveResults(r *tasks.Results) error {
+	for _, robotsResult := range r.Robots {
+		if !robotsResult.Changed {
+			continue
+		}
 
-// func SaveResults(r *tasks.Results) error {
-// 	robotsQuery := `UPDATE robots
-// 		SET (allowed_patterns, disallowed_patterns, last_crawl) = ($1, $2, CURRENT_DATE)
-// 		FROM site WHERE site.url = $3
-// 		AND site.id = robots.site_id;`
+		if !robotsResult.Success {
+			continue // temporary - should probably do something
+		}
 
-// 	for urlS, robotsResult := range r.Robots {
-// 		if !robotsResult.Changed {
-// 			continue
-// 		}
+		p, err := SiteByUrl(robotsResult.Url)
 
-// 		if !robotsResult.Success {
-// 			continue // temporary - should probably do something
-// 		}
+		if err != nil {
+			log.Printf("failed to get site with url '%s' : %v\n", robotsResult.Url.String(), err)
+			continue
+		}
 
-// 		_, err := dbpool.Exec(context.Background(), robotsQuery, robotsResult.Validator.AllowedStrings(), robotsResult.Validator.DisallowedStrings(), urlS)
-// 		if err != nil {
-// 			return fmt.Errorf("unable to save robots result: %w", err)
-// 		}
-// 	}
+		p.Validator = *robotsResult.Validator
+		p.LastRobotsCrawl = time.Now()
 
-// 	const maxCrawlInterval = 60
-// 	const minCrawlInterval = 7
+		err = p.Save()
+		if err != nil {
+			log.Printf("failed to save robots result: %v\n", err)
+			continue
+		}
+	}
 
-// 	for urlS, pageResult := range r.Pages {
-// 		p, err := PageByUrl(urlS, true)
-// 		if err != nil {
-// 			return fmt.Errorf("unable to save page result: %w", err)
-// 		}
+	for _, pageResult := range r.Pages {
+		p, err := PageByUrl(pageResult.Url)
+		if err != nil {
+			log.Printf("failed to get page by url: %v\n", err)
+			continue
+		}
 
-// 		if pageResult.Changed {
-// 			p.Title = pageResult.Page.Title
-// 			p.OgTitle = pageResult.Page.OgTitle
-// 			p.OgDescription = pageResult.Page.OgDescription
-// 			p.Hash = pageResult.Page.Hash
-// 			p.Links = pageResult.Page.Links
+		// will be nil if failed
+		if pageResult.Page != nil {
+			p.Page = *pageResult.Page
+		}
 
-// 			if pageResult.Changed {
-// 				p.IntervalDelta--
-// 				if p.IntervalDelta > -1 {
-// 					p.IntervalDelta = -1
-// 				}
-// 			} else {
-// 				p.IntervalDelta++
-// 				if p.IntervalDelta < 1 {
-// 					p.IntervalDelta = 1
-// 				}
-// 			}
+		p.ScheduleNextCrawl(pageResult.Changed)
+		p.Assigned = false
 
-// 			p.CrawlInterval += p.IntervalDelta
-// 			if p.CrawlInterval < minCrawlInterval {
-// 				p.CrawlInterval = minCrawlInterval
-// 			} else if p.CrawlInterval > maxCrawlInterval {
-// 				p.CrawlInterval = maxCrawlInterval
-// 			}
-// 			p.NextCrawl = p.NextCrawl.AddDate(0, 0, p.CrawlInterval)
+		err = p.Save()
+		if err != nil {
+			log.Printf("failed to save page result: %v\n", err)
+			continue
+		}
 
-// 			err = p.Save(false)
-// 			if err != nil {
-// 				return fmt.Errorf("unable to save page result: %w", err)
-// 			}
-// 		}
-// 		err = p.SaveCrawl(time.Now(), pageResult.Success, pageResult.FailureReason, pageResult.Changed, pageResult.Page.Hash)
-// 		if err != nil {
-// 			return fmt.Errorf("unable to save page result: %w", err)
-// 		}
-// 	}
+		// err = p.SaveCrawl(time.Now(), pageResult.Success, pageResult.FailureReason, pageResult.Changed, pageResult.Page.Hash)
+		// if err != nil {
+		// 	return fmt.Errorf("unable to save page result: %w", err)
+		// }
+	}
 
-// 	return nil
-// }
+	return nil
+}

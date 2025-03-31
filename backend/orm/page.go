@@ -11,8 +11,12 @@ import (
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/url"
 
+	"github.com/ZakkBob/AskDave/gocommon/utils"
 	"github.com/jackc/pgx/v5"
 )
+
+const maxCrawlInterval = 60
+const minCrawlInterval = 7
 
 type OrmPage struct {
 	page.Page
@@ -39,6 +43,28 @@ func (p *OrmPage) Site() (OrmSite, error) {
 		return s, fmt.Errorf("failed to get page's site: %w", err)
 	}
 	return s, err
+}
+
+func (p *OrmPage) ScheduleNextCrawl(changed bool) {
+	if changed {
+		p.IntervalDelta--
+		if p.IntervalDelta > -1 {
+			p.IntervalDelta = -1
+		}
+	} else {
+		p.IntervalDelta++
+		if p.IntervalDelta < 1 {
+			p.IntervalDelta = 1
+		}
+	}
+
+	p.CrawlInterval += p.IntervalDelta
+	if p.CrawlInterval < minCrawlInterval {
+		p.CrawlInterval = minCrawlInterval
+	} else if p.CrawlInterval > maxCrawlInterval {
+		p.CrawlInterval = maxCrawlInterval
+	}
+	p.NextCrawl = p.NextCrawl.AddDate(0, 0, p.CrawlInterval)
 }
 
 // func (p *OrmPage) SaveCrawl(datetime time.Time, success bool, failureReason tasks.FailureReason, contentChanged bool, hash hash.Hash) error {
@@ -153,6 +179,11 @@ func CreatePage(p page.Page, nextCrawl time.Time, crawlInterval int, intervalDel
 	if err != nil {
 		return OrmPage{}, fmt.Errorf("failed to get site by url '%s': %w", p.Url.String(), err)
 	}
+
+	p.Title = utils.Truncate(p.Title, 50)
+	p.OgTitle = utils.Truncate(p.OgTitle, 50)
+	p.OgDescription = utils.Truncate(p.OgDescription, 100)
+	p.OgSiteName = utils.Truncate(p.OgSiteName, 50)
 
 	ormPage := OrmPage{
 		Page:          p,
