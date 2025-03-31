@@ -9,13 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var router *gin.Engine
-
-func Init() {
-	router = gin.Default()
-	router.GET("/tasks", GetTasks)
-	router.POST("/results", PostResults)
-	router.Run() // listen and serve on 0.0.0.0:8080
+func Init(router *gin.Engine, prefix string) {
+	router.GET(prefix+"/tasks", GetTasks)
+	router.POST(prefix+"/results", PostResults)
 }
 
 func GetTasks(c *gin.Context) {
