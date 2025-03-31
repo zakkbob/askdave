@@ -32,7 +32,13 @@ type NetFetcher struct {
 }
 
 func (f *NetFetcher) Fetch(u string) (Response, error) {
-	resp, err := http.Get(u)
+	client := http.Client{
+		Timeout: 5 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	resp, err := client.Get(u)
 	if f.Debug {
 		fmt.Printf("fetching url '%s'\n", u)
 	}
