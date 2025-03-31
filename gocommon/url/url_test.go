@@ -1,6 +1,7 @@
 package url_test
 
 import (
+	"log"
 	"testing"
 
 	"errors"
@@ -18,14 +19,20 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	{
-		in:          "https://www.example.com",
+		in:          "http://www.example.com",
+		out:         "http://www.example.com",
+		parseErr:    nil,
+		parseAbsErr: nil,
+	},
+	{
+		in:          "https://www.example.com?query=true",
 		out:         "https://www.example.com",
 		parseErr:    nil,
 		parseAbsErr: nil,
 	},
 	{
-		in:          "http://www.example.com",
-		out:         "http://www.example.com",
+		in:          "https://www.example.com?",
+		out:         "https://www.example.com",
 		parseErr:    nil,
 		parseAbsErr: nil,
 	},
@@ -79,6 +86,7 @@ func TestParse(t *testing.T) {
 			return
 		}
 
+		log.Printf("%v", u)
 		require.Equal(t, test.out, u.String())
 	}
 }

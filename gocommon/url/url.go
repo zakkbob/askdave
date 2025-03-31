@@ -72,6 +72,7 @@ func normaliseURL(u *URL) error {
 	}
 
 	u.RawQuery = ""
+	u.ForceQuery = false
 	u.Fragment = ""
 	u.RawFragment = ""
 	u.User = nil
