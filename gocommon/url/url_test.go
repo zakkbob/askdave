@@ -42,6 +42,12 @@ var parseTests = []parseTest{
 		parseAbsErr: nil,
 	},
 	{
+		in:          "https://www.example.com?params=true",
+		out:         "https://www.example.com",
+		parseErr:    nil,
+		parseAbsErr: nil,
+	},
+	{
 		in:          "ftp://www.example.com",
 		out:         "",
 		parseErr:    url.ErrInvalidScheme,

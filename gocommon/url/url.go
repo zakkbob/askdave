@@ -62,6 +62,7 @@ func Parse(rawURL string) (*URL, error) {
 		return nil, ErrInvalidScheme
 	}
 
+	u.RawQuery = ""
 	u.Fragment = ""
 	u.RawFragment = ""
 	u.User = nil
