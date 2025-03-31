@@ -19,7 +19,7 @@ func SaveResults(r *tasks.Results) error {
 		p, err := SiteByUrl(robotsResult.Url)
 
 		if err != nil {
-			log.Println("failed to get site with url '%s' : %w", robotsResult.Url.String(), err)
+			log.Printf("failed to get site with url '%s' : %v\n", robotsResult.Url.String(), err)
 			continue
 		}
 
@@ -27,7 +27,7 @@ func SaveResults(r *tasks.Results) error {
 
 		err = p.Save()
 		if err != nil {
-			log.Println("failed to save robots result: %w", err)
+			log.Printf("failed to save robots result: %v\n", err)
 			continue
 		}
 	}
@@ -35,7 +35,7 @@ func SaveResults(r *tasks.Results) error {
 	for _, pageResult := range r.Pages {
 		p, err := PageByUrl(pageResult.Url)
 		if err != nil {
-			log.Println("failed to get page by url: %w", err)
+			log.Printf("failed to get page by url: %v\n", err)
 			continue
 		}
 
@@ -49,7 +49,7 @@ func SaveResults(r *tasks.Results) error {
 
 		err = p.Save()
 		if err != nil {
-			log.Println("failed to save page result: %w", err)
+			log.Printf("failed to save page result: %v\n", err)
 			continue
 		}
 
