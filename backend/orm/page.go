@@ -183,7 +183,7 @@ func CreatePage(p page.Page, nextCrawl time.Time, crawlInterval int, intervalDel
 	p.Title = utils.Truncate(p.Title, 50)
 	p.OgTitle = utils.Truncate(p.OgTitle, 50)
 	p.OgDescription = utils.Truncate(p.OgDescription, 100)
-	p.OgSiteName = utils.Truncate(p.Title, 50)
+	p.OgSiteName = utils.Truncate(p.OgSiteName, 50)
 
 	ormPage := OrmPage{
 		Page:          p,
