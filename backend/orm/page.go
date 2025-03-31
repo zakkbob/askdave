@@ -11,6 +11,7 @@ import (
 	"github.com/ZakkBob/AskDave/gocommon/page"
 	"github.com/ZakkBob/AskDave/gocommon/url"
 
+	"github.com/ZakkBob/AskDave/gocommon/utils"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -178,6 +179,11 @@ func CreatePage(p page.Page, nextCrawl time.Time, crawlInterval int, intervalDel
 	if err != nil {
 		return OrmPage{}, fmt.Errorf("failed to get site by url '%s': %w", p.Url.String(), err)
 	}
+
+	p.Title = utils.Truncate(p.Title, 50)
+	p.OgTitle = utils.Truncate(p.OgTitle, 50)
+	p.OgDescription = utils.Truncate(p.OgDescription, 100)
+	p.OgSiteName = utils.Truncate(p.Title, 50)
 
 	ormPage := OrmPage{
 		Page:          p,
