@@ -45,7 +45,7 @@ func GetSearchResults(c *gin.Context) {
 													LEFT JOIN site 
 													ON page.site = site.id
 												) results(url, sitename, title, description, rank)
-												WHERE rank > 0
+												WHERE rank > 1
 												ORDER BY rank DESC
 												LIMIT 20;`, "%"+search.Query+"%")
 

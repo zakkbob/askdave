@@ -15,7 +15,7 @@ func Init(router *gin.Engine, prefix string) {
 }
 
 func GetTasks(c *gin.Context) {
-	t, _ := orm.NextTasks(10)
+	t, _ := orm.NextTasks(1000)
 
 	c.IndentedJSON(http.StatusOK, t)
 }
