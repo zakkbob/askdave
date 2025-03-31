@@ -10,8 +10,8 @@ var router *gin.Engine
 
 func Init() {
 	router = gin.Default()
-	crawlerapi.Init(router, "/api/crawler")
-	searchapi.Init(router, "/api/search")
+	crawlerapi.Init(router, "/api/v1/crawler")
+	searchapi.Init(router, "/api/v1/search")
 }
 
 func Run() {
