@@ -18,9 +18,25 @@ type URL struct {
 var ErrInvalidScheme = errors.New("url does not contain a valid scheme")
 var ErrNotAbsolute = errors.New("url is not absolute")
 
+// Parse parses a [URL] in the context of the receiver.
+// The provided URL may be relative or absolute.
+// Parse returns nil, err on parse failure.
+// Normalises a URL by stripping the query, fragment, and user.
+// Returns an ErrInvalidScheme if the scheme is not 'http' or 'https'
+// Returns ErrNotAbsolute if the scheme is empty
 func (u *URL) Parse(ref string) (*URL, error) {
 	parsed, err := u.URL.Parse(ref)
-	return &URL{URL: *parsed}, err
+	if err != nil {
+		return nil, err
+	}
+
+	newURL := &URL{URL: *parsed}
+	err = normaliseURL(newURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return newURL, err
 }
 
 // Returns url string without path
@@ -32,9 +48,9 @@ func (u *URL) StringNoPath() string {
 
 // Parses an absolute raw url into a [URL] struct
 //
-// Normalises the url by removing the fragment and credentials.
-// Will return an error if the scheme is not 'http' or 'https'.
-// Will return an error if the url is not absolute.
+// Normalises a URL by stripping the query, fragment, and user.
+// Returns an ErrInvalidScheme if the scheme is not 'http' or 'https'
+// Returns ErrNotAbsolute if the scheme is empty
 func ParseAbs(rawURL string) (*URL, error) {
 	u, err := Parse(rawURL)
 	if err != nil {
@@ -48,18 +64,11 @@ func ParseAbs(rawURL string) (*URL, error) {
 	return u, nil
 }
 
-// Parses a raw url into a [URL] struct
-//
-// Normalises the url by removing the fragment and credentials.
-// Will return an error if the scheme is not blank or 'http' or 'https'.
-func Parse(rawURL string) (*URL, error) {
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse raw url: %w", err)
-	}
-
+// Normalises a URL by stripping the query, fragment, and user.
+// Returns an ErrInvalidScheme if the scheme is not ”, 'http' or 'https'
+func normaliseURL(u *URL) error {
 	if u.Scheme != "http" && u.Scheme != "https" && u.Scheme != "" {
-		return nil, ErrInvalidScheme
+		return ErrInvalidScheme
 	}
 
 	u.RawQuery = ""
@@ -67,12 +76,33 @@ func Parse(rawURL string) (*URL, error) {
 	u.RawFragment = ""
 	u.User = nil
 
-	return &URL{URL: *u}, nil
+	return nil
+}
+
+// Parses a raw url into a [URL] struct
+//
+// Normalises a URL by stripping the query, fragment, and user.
+// Returns an ErrInvalidScheme if the scheme is not ”, 'http' or 'https'
+func Parse(rawURL string) (*URL, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse raw url: %w", err)
+	}
+
+	newURL := &URL{URL: *u}
+
+	err = normaliseURL(newURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse raw url: %w", err)
+	}
+
+	return newURL, nil
 }
 
 // Parses an array of strings into a [URL] array
 //
-// Uses ParseAbs
+// Normalises a URL by stripping the query, fragment, and user.
+// Returns an ErrInvalidScheme if the scheme is not ”, 'http' or 'https'
 func ParseMany(rawURLs []string) ([]*URL, error) {
 	urls := make([]*URL, 0)
 	var u *URL
@@ -94,10 +124,10 @@ func (u *URL) MarshalJSON() ([]byte, error) {
 func (u *URL) UnmarshalJSON(data []byte) error {
 	var s string
 	json.Unmarshal(data, &s)
-	tmp, err := url.Parse(s)
+	tmp, err := Parse(s)
 	if err != nil {
 		return fmt.Errorf("failed to parse url: %w", err)
 	}
-	*u = URL{URL: *tmp}
+	*u = *tmp
 	return nil
 }
